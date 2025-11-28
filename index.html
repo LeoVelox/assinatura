@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sistema de Gestão de Orçamentos e Ordens de Serviço - Automatize e profissionalize seus processos com o OSflex"
+    />
+    <meta property="og:title" content="OSflex | Gestão de Orçamentos e OS" />
+    <meta
+      property="og:description"
+      content="Crie orçamentos profissionais e converta em ordens de serviço com um clique"
+    />
+    <meta property="og:type" content="website" />
+    <title>SarmTech | Gestão de Orçamentos e Ordens de Serviço</title>
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/main.css" media="all" />
+
+    <link rel="icon" href="assets/favicon/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+  </head>
+
+  <body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link"
+      >Pular para o conteúdo principal</a
+    >
+
+    <header class="header">
+      <div class="container">
+        <div class="header__inner">
+          <a href="/" class="logo" aria-label="OSflex - Página inicial">
+            <img
+              src="assets/favicon/web-app-manifest-512x512.png"
+              alt="Logo OSflex"
+              width="60"
+              height="60"
+              style="display: inline-block; vertical-align: middle"
+            />
+            <span>SarmTech</span>
+          </a>
+
+          <button
+            class="nav-toggle"
+            aria-label="Abrir menu"
+            aria-expanded="false"
+            aria-controls="main-nav"
+          >
+            <span class="hamburger"></span>
+          </button>
+
+          <nav id="main-nav" class="nav">
+            <ul class="nav__list">
+              <li><a href="#features" class="nav__link">Funcionalidades</a></li>
+              <li><a href="#demo" class="nav__link">Demonstração</a></li>
+              <li>
+                <a href="#ordens-servico" class="nav__link">Praticidade</a>
+              </li>
+              <li><a href="#beneficios" class="nav__link">Benefícios</a></li>
+            </ul>
+          </nav>
+
+          <div class="theme-switcher">
+            <button class="theme-toggle" aria-label="Alternar tema">
+              <svg
+                class="sun"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg
+                class="moon"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero">
+        <div class="container">
+          <div class="hero__content">
+            <h1 class="hero__title">
+              Sistema completo para Orçamentos, Ordens de Serviço e geração de
+              NFS-e
+            </h1>
+            <p class="hero__text">
+              Com o <strong>OSflex</strong>, crie orçamentos profissionais,
+              converta em OS, gere nfe, com tudo automatizado em um único
+              sistema integrado.
+            </p>
+            <div class="hero__cta">
+              <a href="cadastro.html" class="btn btn--primary btn-large">
+                <i class="fas fa-rocket"></i> Começar Grátis por 30 Dias
+              </a>
+              <a href="#demo" class="btn btn--secondary">Ver demonstração</a>
+            </div>
+          </div>
+          <div class="hero__image">
+            <img
+              src="assets/images/apresentacao2.png"
+              alt="Interface do OSflex mostrando criação de orçamento e ordem de serviço"
+              width="1200"
+              height="800"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção de Benefícios -->
+      <section id="beneficios" class="benefits">
+        <div class="container">
+          <div class="section__header">
+            <h2 class="section__title">Por que escolher o OSflex?</h2>
+            <p class="section__subtitle">
+              Tudo que você precisa para gerenciar seu negócio com eficiência
+            </p>
+          </div>
+          <div class="benefits__grid">
+            <div class="benefit-card">
+              <div class="benefit-icon">🚀</div>
+              <h3>Implementação Rápida</h3>
+              <p>
+                Comece a usar em minutos, sem necessidade de treinamento
+                complexo
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="benefit-icon">💰</div>
+              <h3>Teste Gratuito</h3>
+              <p>
+                30 dias completos para experimentar todas as funcionalidades
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="benefit-icon">📈</div>
+              <h3>Aumente sua Produtividade</h3>
+              <p>Reduza o tempo de criação de OS em até 80%</p>
+            </div>
+            <div class="benefit-card">
+              <div class="benefit-icon">💼</div>
+              <h3>Profissionalize seu Negócio</h3>
+              <p>
+                Documentos padronizados que transmitem confiança aos clientes
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="features">
+        <div class="container">
+          <div class="section__header">
+            <h2 class="section__title">Funcionalidades Principais</h2>
+            <p class="section__subtitle">
+              Tudo que você precisa para gerenciar seus orçamentos e ordens de
+              serviço com eficiência
+            </p>
+          </div>
+
+          <div class="features__grid">
+            <article class="feature-card">
+              <div class="feature-card__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <h3 class="feature-card__title">Gestão de Ordens e Orçamentos</h3>
+              <p class="feature-card__text">
+                Cadastre cliente, equipamento, serviço e valor em poucos cliques
+                com nossa interface otimizada.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <path d="M12 18a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2"></path>
+                  <line x1="12" y1="12" x2="12" y2="12.01"></line>
+                </svg>
+              </div>
+              <h3 class="feature-card__title">Geração de PDF Profissional</h3>
+              <p class="feature-card__text">
+                Gere orçamento ou ordens de serviço com layout profissional em
+                PDF, prontas para impressão ou envio digital.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  ></path>
+                  <line x1="8" y1="10" x2="16" y2="10"></line>
+                  <line x1="8" y1="14" x2="14" y2="14"></line>
+                </svg>
+              </div>
+              <h3 class="feature-card__title">Histórico Inteligente</h3>
+              <p class="feature-card__text">
+                Acompanhe todas os orçamentos e ordens de serviço já criadas com
+                busca avançada por cliente, data, status e mais.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="M9.5 9h5"></path>
+                  <path d="M12 12v5"></path>
+                </svg>
+              </div>
+              <h3 class="feature-card__title">Segurança de Dados</h3>
+              <p class="feature-card__text">
+                Seus dados protegidos com criptografia e backups automáticos.
+                Conformidade com LGPD.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <h3 class="feature-card__title">Modelos Personalizados</h3>
+              <p class="feature-card__text">
+                Modelos de orçamento com sua marca, termos e estrutura de
+                serviços.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  ></path>
+                  <path d="M14.05 2a9 9 0 0 1 8 7.94"></path>
+                  <path d="M14.05 6A5 5 0 0 1 18 10"></path>
+                </svg>
+              </div>
+              <h3 class="feature-card__title">Envio Digital</h3>
+              <p class="feature-card__text">
+                Envie orçamentos e Ordem de serviço por WhatsApp ou e-mail, para
+                o seu cliente.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="demo" class="demo">
+        <div class="container">
+          <div class="section__header">
+            <h2 class="section__title">Veja como funciona</h2>
+            <p class="section__subtitle">
+              Interface simples e intuitiva. Crie sua OS em menos de 1 minuto.
+            </p>
+          </div>
+
+          <div class="demo__content">
+            <div class="demo__video">
+              <div class="video-container">
+                <video
+                  controls
+                  poster="assets/images/testimonials/Screenshot_1.png"
+                  preload="metadata"
+                  aria-label="Demonstração do OSflex em funcionamento"
+                >
+                  <source src="assets/videos/Nature.webm" type="video/mp4" />
+                  <p>
+                    Seu navegador não suporta o elemento de vídeo.
+                    <a href="assets/videos/demo.mp4">Baixe o vídeo</a>.
+                  </p>
+                </video>
+              </div>
+            </div>
+
+            <div class="demo__features">
+              <div class="feature-item">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Cadastro rápido de clientes</span>
+              </div>
+
+              <div class="feature-item">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Modelos personalizáveis</span>
+              </div>
+
+              <div class="feature-item">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Identificar unico para cada serviço</span>
+              </div>
+
+              <div class="feature-item">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Envio direto por WhatsApp ou e-mail</span>
+              </div>
+
+              <div class="feature-item">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Relatórios</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção de Ordens de Serviço Simplificada -->
+      <section id="ordens-servico" class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Controle seus Orçamento e Ordens de Serviço</h2>
+            <p class="subtitle">
+              Fácil de usar, feito para quem trabalha no dia a dia
+            </p>
+          </div>
+
+          <div class="features-grid">
+            <!-- Card 1 -->
+            <div class="feature-card">
+              <div class="card-icon">📋</div>
+              <h3>Crie em 1 minuto</h3>
+              <p>
+                Preencha só o necessário e gere "Orçamento" profissional
+                rapidamente.
+              </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="feature-card">
+              <div class="card-icon">💳</div>
+              <h3>Orçamento vira OS</h3>
+              <p>
+                Converta orçamentos aprovados em OS com um clique, sem refazer
+                cadastro.
+              </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="feature-card">
+              <div class="card-icon">📱</div>
+              <h3>Envio por WhatsApp</h3>
+              <p>
+                Mande Orçamentos ou OS`s direto para o cliente pelo celular ou
+                e-mail, de forma pratica e fácil.
+              </p>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="feature-card">
+              <div class="card-icon">✔️</div>
+              <h3>Validação do cliente</h3>
+              <p>
+                Você envia o orçamento por WhatsApp/e-mail e mantém o controle
+                total da negociação e confirmação com o cliente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-final">
+        <div class="container">
+          <div class="cta-final__content">
+            <h2>Pronto para revolucionar sua gestão?</h2>
+            <p>
+              Junte-se a centenas de profissionais que já transformaram seus
+              negócios
+            </p>
+            <a
+              href="cadastro-pagamento.html"
+              class="btn btn--primary btn-large"
+            >
+              <i class="fas fa-play-circle"></i> Começar Agora - 30 Dias Grátis
+            </a>
+            <small>Sem compromisso, sem cartão de crédito</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="testimonials">
+        <div class="container">
+          <div class="section__header">
+            <h2 class="section__title">O que nossos clientes dizem</h2>
+            <p class="section__subtitle">
+              Mais de 500 profissionais já transformaram sua gestão com o OSflex
+            </p>
+          </div>
+
+          <div class="testimonials__grid">
+            <article class="testimonial-card">
+              <div class="testimonial-card__rating">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+              </div>
+              <p class="testimonial-card__text">
+                "O OSflex revolucionou nosso atendimento técnico. Agora emitimos
+                ordens de serviço profissionais em segundos e nossos clientes
+                adoraram a mudança."
+              </p>
+              <div class="testimonial-card__author">
+                <img
+                  src="assets/images/testimonials/1.webp"
+                  alt="Foto de Carlos Silva"
+                  width="48"
+                  height="48"
+                  loading="lazy"
+                />
+                <div>
+                  <h4>Carlos Silva</h4>
+                  <span>Técnico em Refrigeração</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="testimonial-card">
+              <div class="testimonial-card__rating">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+              </div>
+              <p class="testimonial-card__text">
+                "Como dona de uma pequena assistência técnica, o OSflex me
+                ajudou a organizar todos os atendimentos e melhorou muito minha
+                comunicação com os clientes."
+              </p>
+              <div class="testimonial-card__author">
+                <img
+                  src="assets/images/testimonials/2.webp"
+                  alt="Foto de Ana Oliveira"
+                  width="48"
+                  height="48"
+                  loading="lazy"
+                />
+                <div>
+                  <h4>Ana Oliveira</h4>
+                  <span>Assistência Técnica de Eletrônicos</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="testimonial-card">
+              <div class="testimonial-card__rating">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+              </div>
+              <p class="testimonial-card__text">
+                "Implementamos o OSflex em nossa equipe de 8 técnicos e o
+                retorno foi imediato. A padronização das OSs e o histórico de
+                atendimentos foram diferenciais."
+              </p>
+              <div class="testimonial-card__author">
+                <img
+                  src="assets/images/testimonials/3.webp"
+                  alt="Foto de Ricardo Mendes"
+                  width="48"
+                  height="48"
+                  loading="lazy"
+                />
+                <div>
+                  <h4>Ricardo Mendes</h4>
+                  <span>Gerente de Manutenção</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="cta">
+        <div class="container">
+          <div class="cta__content">
+            <h2 class="cta__title">
+              Pronto para transformar sua gestão de OS?
+            </h2>
+            <p class="cta__text">
+              Experimente gratuitamente por 30 dias. Sem necessidade de
+              pagamento.
+            </p>
+            <div class="cta__buttons">
+              <a href="cadastro-pagamento.html" class="btn btn--primary"
+                >Começar agora</a
+              >
+              <a href="#" class="btn btn--secondary">Falar com vendas</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__grid">
+          <div class="footer__brand">
+            <a href="/" class="logo" aria-label="OSflex - Página inicial">
+              <img
+                src="assets/favicon/apple-touch-icon.png"
+                alt="Logo OSflex"
+                width="40"
+                height="40"
+                style="display: inline-block; vertical-align: middle"
+              />
+              <span>SarmTech</span>
+            </a>
+            <p class="footer__text">
+              A solução completa para gestão de ordens de serviço.
+              Profissionalismo e eficiência para seu negócio.
+            </p>
+            <div class="footer__social">
+              <a href="#" aria-label="Facebook">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                  ></path>
+                </svg>
+              </a>
+              <a href="#" aria-label="Instagram">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path
+                    d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+                  ></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+              <a href="#" aria-label="WhatsApp">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer__nav">
+            <h4 class="footer__title">Produto</h4>
+            <ul>
+              <li><a href="#features">Funcionalidades</a></li>
+              <li><a href="#demo">Demonstração</a></li>
+              <li><a href="#plans">Planos</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+
+          <div class="footer__nav">
+            <h4 class="footer__title">Empresa</h4>
+            <ul>
+              <li><a href="#">Sobre nós</a></li>
+              <li><a href="#">Carreiras</a></li>
+              <li><a href="#">Termos de serviço</a></li>
+              <li><a href="#">Política de privacidade</a></li>
+            </ul>
+          </div>
+
+          <div class="footer__nav">
+            <h4 class="footer__title">Suporte</h4>
+            <ul>
+              <li><a href="#">Central de ajuda</a></li>
+              <li><a href="#">Status do sistema</a></li>
+              <li><a href="#">Contato</a></li>
+              <li><a href="#">LGPD</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer__bottom">
+          <p class="footer__copyright">
+            © 2025 SarmTech. Todos os direitos reservados.
+          </p>
+          <div class="footer__links">
+            <a href="#">Termos de uso</a>
+            <a href="#">Política de privacidade</a>
+            <a href="#">Cookies</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Modern JavaScript approach -->
+    <script src="assets/js/main.js" type="module"></script>
+
+    <script>
+      // Função para redirecionar para a página de pagamento com os parâmetros corretos
+      function assinarPlano(planoId) {
+        const isAnnual = document.getElementById("billing-toggle").checked;
+        const billingType = isAnnual ? "annual" : "monthly";
+
+        window.location.href = `cadastro-pagamento.html?plano=${planoId}&billing=${billingType}`;
+      }
+
+      // Inicializar toggle de preços
+      document.addEventListener("DOMContentLoaded", function () {
+        const billingToggle = document.getElementById("billing-toggle");
+        if (billingToggle) {
+          // Inicializar estado - mostrar preços mensais primeiro
+          const monthlyPrices = document.querySelectorAll(
+            ".pricing-card__price:not(.yearly)"
+          );
+          const yearlyPrices = document.querySelectorAll(
+            ".pricing-card__price.yearly"
+          );
+
+          // Esconder preços anuais inicialmente
+          yearlyPrices.forEach((price) => (price.style.display = "none"));
+          monthlyPrices.forEach((price) => (price.style.display = "block"));
+
+          billingToggle.addEventListener("change", function () {
+            if (this.checked) {
+              monthlyPrices.forEach((price) => (price.style.display = "none"));
+              yearlyPrices.forEach((price) => (price.style.display = "block"));
+            } else {
+              monthlyPrices.forEach((price) => (price.style.display = "block"));
+              yearlyPrices.forEach((price) => (price.style.display = "none"));
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
