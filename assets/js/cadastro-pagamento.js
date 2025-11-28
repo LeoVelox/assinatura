@@ -404,6 +404,60 @@ async function createTrialAccount() {
   }
 }
 
+async function processTokenFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
+  const type = urlParams.get("type");
+
+  if (token && type === "signup") {
+    console.log("🔄 Processando token da URL...", token);
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        token: token,
+        type: "signup",
+      });
+
+      if (error) {
+        console.error("❌ Erro ao verificar token:", error);
+      } else {
+        console.log("✅ Token verificado com sucesso!");
+        // O usuário agora está confirmado
+        showSuccess();
+      }
+    } catch (error) {
+      console.error("❌ Erro no processamento do token:", error);
+    }
+  }
+}
+
+// E modifique a função processConfirmation:
+async function processConfirmation() {
+  try {
+    console.log("🔍 Iniciando processamento de confirmação...");
+
+    // Primeiro tenta processar token da URL
+    await processTokenFromURL();
+
+    // Depois verifica a sessão normalmente
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      console.log("✅ Sessão ativa detectada:", session.user.email);
+      showSuccess();
+    } else {
+      console.log("ℹ️ Aguardando confirmação...");
+      // Mantém mostrando "Processando..." até a confirmação
+    }
+  } catch (error) {
+    console.error("❌ Erro no processamento:", error);
+    showError(error.message);
+  }
+}
+
 // Mostrar modal de sucesso
 function showSuccessModal(message) {
   // Criar modal dinamicamente
