@@ -24,15 +24,6 @@
     />
     <link rel="manifest" href="./favicon/site.webmanifest" />
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script>
-      const supabase = supabasejs.createClient(
-        "https://pjvgzbnqnwrqxwlbndkr.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE"
-      );
-    </script>
-
     <style>
       body {
         margin: 0;
@@ -107,8 +98,8 @@
       <div id="success" style="display: none">
         <h1 class="success">✅ Cadastro Confirmado!</h1>
         <p>
-          Seu trial de <strong>30 dias</strong> será ativado. Agora você pode
-          acessar o sistema.
+          Seu trial de <strong>30 dias</strong> foi ativado com sucesso! Agora
+          você pode acessar o sistema.
         </p>
         <button class="btn" id="btn-access">Acessar Sistema</button>
       </div>
@@ -120,17 +111,42 @@
       </div>
     </div>
 
-    <script type="module">
-      import { supabase } from "./assets/js/supabaseClient.js";
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.min.js"></script>
 
-      // Exibir sucesso
-      function showSuccess() {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error").style.display = "none";
-        document.getElementById("success").style.display = "block";
+    <script>
+      const client = supabase.createClient(
+        "https://pjvgzbnqnwrqxwlbndkr.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE"
+      );
+
+      async function processConfirmation() {
+        try {
+          console.log("🔥 Supabase carregado:", client);
+
+          const params = new URLSearchParams(window.location.search);
+          const token_hash = params.get("token_hash");
+
+          console.log("📌 Capturado:", { token_hash });
+
+          if (!token_hash) throw new Error("Token não encontrado.");
+
+          // 🚀 CORRETO PARA LINK DE CONFIRMAÇÃO — type: "email"
+          const { data, error } = await client.auth.verifyOtp({
+            token_hash,
+            type: "email",
+          });
+
+          if (error) throw new Error(error.message);
+
+          console.log("✅ Confirmado:", data);
+          showSuccess();
+        } catch (err) {
+          console.error("❌ Erro no processamento:", err);
+          showError("Falha na confirmação: " + err.message);
+        }
       }
 
-      // Exibir erro
       function showError(message) {
         document.getElementById("loading").style.display = "none";
         document.getElementById("success").style.display = "none";
@@ -138,69 +154,18 @@
         document.getElementById("errorMessage").textContent = message;
       }
 
-      // Botões
-      document.getElementById("btn-access").addEventListener("click", () => {
-        // Ajuste para a url do seu painel
-        window.location.href = "https://sarmtech.netlify.app/";
-      });
-      document.getElementById("btn-back").addEventListener("click", () => {
-        window.location.href = "https://sarmtech.netlify.app/";
-      });
-
-      // Função principal
-      async function processConfirmation() {
-        try {
-          console.log("🔍 Iniciando processamento de confirmação...");
-
-          const params = new URLSearchParams(window.location.search);
-          const token_hash = params.get("token_hash");
-          let type = params.get("type");
-
-          if (!type) type = "signup"; // fallback importante
-
-          console.log("📌 Capturado:", { token_hash, type });
-
-          if (token_hash && type) {
-            const { data, error } = await supabase.auth.verifyOtp({
-              token_hash: token_hash,
-              type: type,
-            });
-
-            if (error)
-              throw new Error(error.message || "Erro ao confirmar conta");
-
-            console.log("✅ Confirmado:", data);
-            showSuccess();
-            return;
-          }
-
-          // verifica sessão como fallback
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.getSession();
-          if (sessionError) throw sessionError;
-
-          const session = sessionData?.session;
-          if (session?.user) {
-            const { data: userResponse } = await supabase.auth.getUser();
-            const confirmedAt = userResponse?.user?.confirmed_at;
-            if (confirmedAt) {
-              showSuccess();
-              return;
-            }
-            throw new Error("Sessão detectada, mas email não confirmado.");
-          }
-
-          throw new Error(
-            "Link inválido ou expirado. Refaça o cadastro para receber novo e-mail."
-          );
-        } catch (err) {
-          console.error("❌ Erro no processamento:", err);
-          showError("Falha na confirmação: " + (err?.message || String(err)));
-        }
+      function showSuccess() {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("success").style.display = "block";
       }
 
-      // Executa ao carregar
       document.addEventListener("DOMContentLoaded", processConfirmation);
+
+      document.getElementById("btn-access").onclick = () =>
+        (window.location.href = "https://sarm-tech.netlify.app/app");
+      document.getElementById("btn-back").onclick = () =>
+        (window.location.href = "https://sarm-tech.netlify.app");
     </script>
   </body>
 </html>
