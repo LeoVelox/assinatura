@@ -22,7 +22,7 @@
       sizes="16x16"
       href="./favicon/favicon-16x16.png"
     />
-    <link rel="manifest" href="./favicon/site.webmanifest" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <style>
       body {
@@ -123,27 +123,80 @@
       async function processConfirmation() {
         try {
           console.log("🔥 Supabase carregado:", client);
+          console.log("🔍 URL completa:", window.location.href);
+          console.log(
+            "🔍 Todos os parâmetros:",
+            Object.fromEntries(new URLSearchParams(window.location.search))
+          );
 
           const params = new URLSearchParams(window.location.search);
           const token_hash = params.get("token_hash");
+          const token = params.get("token"); // Adicione esta linha
+          const type = params.get("type") || "email";
 
-          console.log("📌 Capturado:", { token_hash });
+          console.log("📌 Parâmetros capturados:", { token_hash, token, type });
 
-          if (!token_hash) throw new Error("Token não encontrado.");
+          // Se não tiver token_hash, tenta usar token
+          const verificationToken = token_hash || token;
+          if (!verificationToken) {
+            throw new Error("Token de verificação não encontrado.");
+          }
 
-          // 🚀 CORRETO PARA LINK DE CONFIRMAÇÃO — type: "email"
-          const { data, error } = await client.auth.verifyOtp({
-            token_hash,
-            type: "email",
-          });
+          // Tente diferentes abordagens
+          let verificationResult;
 
-          if (error) throw new Error(error.message);
+          // Tenta primeiro com verifyOtp (para email verification)
+          try {
+            verificationResult = await client.auth.verifyOtp({
+              token_hash: verificationToken,
+              type: type,
+            });
+          } catch (otpError) {
+            console.log("⚠️ verifyOtp falhou, tentando signIn...");
 
-          console.log("✅ Confirmado:", data);
+            // Se verifyOtp falhar, tenta signIn com token (para email confirmation)
+            verificationResult = await client.auth.signInWithOtp({
+              token: verificationToken,
+              type: type,
+            });
+          }
+
+          const { data, error } = verificationResult;
+
+          if (error) {
+            console.error("❌ Erro detalhado:", error);
+
+            // Verifica se é um erro comum
+            if (error.message.includes("already confirmed")) {
+              showSuccess("Seu email já foi confirmado anteriormente!");
+              return;
+            }
+
+            throw new Error(error.message);
+          }
+
+          console.log("✅ Confirmado com sucesso:", data);
           showSuccess();
         } catch (err) {
           console.error("❌ Erro no processamento:", err);
-          showError("Falha na confirmação: " + err.message);
+
+          // Mensagens mais amigáveis
+          let userMessage = "Falha na confirmação do email.";
+
+          if (err.message.includes("expired")) {
+            userMessage =
+              "Link expirado. Por favor, solicite um novo link de confirmação.";
+          } else if (err.message.includes("invalid")) {
+            userMessage =
+              "Link inválido. Por favor, verifique o link ou solicite um novo.";
+          } else if (err.message.includes("500")) {
+            userMessage =
+              "Erro interno do servidor. Por favor, tente novamente em alguns minutos.";
+          } else {
+            userMessage = err.message;
+          }
+
+          showError(userMessage);
         }
       }
 
@@ -152,20 +205,39 @@
         document.getElementById("success").style.display = "none";
         document.getElementById("error").style.display = "block";
         document.getElementById("errorMessage").textContent = message;
+
+        // Adiciona botão para reenviar confirmação
+        const resendButton = document.createElement("button");
+        resendButton.className = "btn";
+        resendButton.textContent = "Reenviar Email de Confirmação";
+        resendButton.onclick = resendConfirmation;
+
+        const errorDiv = document.getElementById("error");
+        errorDiv.appendChild(resendButton);
       }
 
-      function showSuccess() {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error").style.display = "none";
-        document.getElementById("success").style.display = "block";
+      async function resendConfirmation() {
+        try {
+          // Extrai email da URL ou pede ao usuário
+          const email = prompt(
+            "Por favor, informe seu email para reenviar a confirmação:"
+          );
+          if (!email) return;
+
+          const { error } = await client.auth.resend({
+            type: "signup",
+            email: email,
+          });
+
+          if (error) throw error;
+
+          alert(
+            "Email de confirmação reenviado com sucesso! Verifique sua caixa de entrada."
+          );
+        } catch (err) {
+          alert("Erro ao reenviar: " + err.message);
+        }
       }
-
-      document.addEventListener("DOMContentLoaded", processConfirmation);
-
-      document.getElementById("btn-access").onclick = () =>
-        (window.location.href = "https://sarm-tech.netlify.app/app");
-      document.getElementById("btn-back").onclick = () =>
-        (window.location.href = "https://sarm-tech.netlify.app");
     </script>
   </body>
 </html>
