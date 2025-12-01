@@ -1,0 +1,45 @@
+[33mcommit 6b11c3ccab3fcb2fe68ec0fd0c9e7354b014d7db[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Leonardo Silvio Sarmento <leo1.silvio@gmail.com>
+Date:   Mon Dec 1 09:36:48 2025 -0300
+
+    Initial commit
+
+ confirm.html | 73 [32m+++++++++[m[31m---------------------------------------------------[m
+ 1 file changed, 11 insertions(+), 62 deletions(-)
+
+[33mcommit 77cb4585e245068db5b254d297e6d96fb4b934de[m
+Author: Leonardo Silvio Sarmento <leo1.silvio@gmail.com>
+Date:   Mon Dec 1 08:50:38 2025 -0300
+
+    Initial commit
+
+ assets/js/cadastro-pagamento.js | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 920894386cf5be9378c405378aefadb02328c30f[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Leonardo Silvio Sarmento <leo1.silvio@gmail.com>
+Date:   Mon Dec 1 08:29:47 2025 -0300
+
+    Initial commit
+
+ assets/js/cadastro-pagamento.js |   2 [32m+[m[31m-[m
+ confirm.html                    | 248 [32m++++++++++++++++++++++++++++++++++++++++[m
+ 2 files changed, 249 insertions(+), 1 deletion(-)
+
+[33mcommit f56ab8b53d0b1337ef51b8795a25a13eff995423[m
+Author: Leonardo Silvio Sarmento <leo1.silvio@gmail.com>
+Date:   Mon Dec 1 08:19:22 2025 -0300
+
+    Initial commit
+
+ assets/js/cadastro-pagamento.js | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit c083af578045bf6c43efb114cd68de5489954a78[m
+Author: Leonardo Silvio Sarmento <leo1.silvio@gmail.com>
+Date:   Fri Nov 28 21:37:20 2025 -0300
+
+    Initial commit
+
+ index.html | 5 [32m++++[m[31m-[m
+ 1 file changed, 4 insertions(+), 1 deletion(-)
