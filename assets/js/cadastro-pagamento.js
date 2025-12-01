@@ -255,7 +255,7 @@ async function createTrialAccount() {
             cpf_cnpj: userData.cpfCnpj,
             phone: userData.phone,
           },
-          emailRedirectTo: "https://sarmtech.netlify.app/confirm.html",
+          emailRedirectTo: "https://sarm-tech.netlify.app/confirm.html",
         },
       }
     );
