@@ -145,93 +145,42 @@
 
           const params = new URLSearchParams(window.location.search);
           const token_hash = params.get("token_hash");
-          const type = params.get("type");
-          const errorParam = params.get("error");
-          const errorDescription = params.get("error_description");
+          let type = params.get("type");
 
-          // Se Supabase redirecionou com ?error=... mostramos o erro
-          if (errorParam) {
-            const decoded = errorDescription
-              ? decodeURIComponent(errorDescription.replace(/\+/g, " "))
-              : "Erro no processo de confirmação";
-            console.warn(
-              "❌ Supabase retornou erro de autenticação:",
-              errorParam,
-              decoded
-            );
-            showError(`Erro do servidor: ${decoded}`);
-            return;
-          }
+          if (!type) type = "signup"; // fallback importante
 
-          // Se veio token_hash (fluxo normal de confirmação)
+          console.log("📌 Capturado:", { token_hash, type });
+
           if (token_hash && type) {
-            console.log(
-              "🔄 Confirmando com token_hash:",
-              token_hash,
-              "type:",
-              type
-            );
-
             const { data, error } = await supabase.auth.verifyOtp({
               token_hash: token_hash,
               type: type,
             });
 
-            if (error) {
-              console.error("❌ verifyOtp retornou erro:", error);
+            if (error)
               throw new Error(error.message || "Erro ao confirmar conta");
-            }
 
-            console.log("✅ Confirmado com verifyOtp:", data);
-
-            // opcional: buscar usuário e confirmar campo
-            try {
-              const { data: userData } = await supabase.auth.getUser();
-              console.log("🔎 Usuário após confirmação:", userData);
-            } catch (e) {
-              console.warn(
-                "⚠️ Falha ao buscar user após confirmação (não crítico):",
-                e
-              );
-            }
-
+            console.log("✅ Confirmado:", data);
             showSuccess();
             return;
           }
 
-          // Se não veio token_hash: verificar sessão (caso o Supabase já tenha trocado por sessão)
-          console.log("ℹ️ token_hash ausente — verificando sessão ativa...");
+          // verifica sessão como fallback
           const { data: sessionData, error: sessionError } =
             await supabase.auth.getSession();
-
-          if (sessionError) {
-            console.error("❌ Erro ao obter sessão:", sessionError);
-            throw new Error(
-              "Erro ao verificar sessão: " + sessionError.message
-            );
-          }
+          if (sessionError) throw sessionError;
 
           const session = sessionData?.session;
           if (session?.user) {
-            // verificar campo de confirmação no usuário
-            const { data: userResponse, error: userError } =
-              await supabase.auth.getUser();
-            if (userError) {
-              console.warn("⚠️ Erro ao obter usuário:", userError);
-            }
+            const { data: userResponse } = await supabase.auth.getUser();
             const confirmedAt = userResponse?.user?.confirmed_at;
             if (confirmedAt) {
-              console.log("🎉 Email já confirmado em:", confirmedAt);
               showSuccess();
               return;
-            } else {
-              throw new Error(
-                "Sessão detectada, mas email ainda não confirmado."
-              );
             }
+            throw new Error("Sessão detectada, mas email não confirmado.");
           }
 
-          // Se chegar aqui, não há token e não há sessão
           throw new Error(
             "Link inválido ou expirado. Refaça o cadastro para receber novo e-mail."
           );
