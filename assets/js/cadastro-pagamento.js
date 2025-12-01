@@ -255,7 +255,7 @@ async function createTrialAccount() {
             cpf_cnpj: userData.cpfCnpj,
             phone: userData.phone,
           },
-          emailRedirectTo: "https://confirmsistem.netlify.app",
+          emailRedirectTo: "https://confirmsistem.netlify.app/index.html",
         },
       }
     );
