@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Confirmação de Cadastro - SarmTech</title>
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./favicon/site.webmanifest" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 36px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        max-width: 480px;
+        width: 95%;
+        text-align: center;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        color: #222;
+      }
+      p {
+        color: #555;
+        line-height: 1.4;
+      }
+      .success {
+        color: #28a745;
+      }
+      .error {
+        color: #dc3545;
+      }
+      .loading {
+        color: #007bff;
+      }
+      .btn {
+        margin-top: 20px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 0;
+        background: #007bff;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+      }
+      .btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+      pre {
+        text-align: left;
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        overflow: auto;
+        max-height: 160px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="loading">
+        <h1 class="loading">Confirmando seu cadastro...</h1>
+        <p>Processando sua confirmação, aguarde um momento.</p>
+      </div>
+
+      <div id="success" style="display: none">
+        <h1 class="success">✅ Cadastro Confirmado!</h1>
+        <p>
+          Seu trial de <strong>30 dias</strong> será ativado. Agora você pode
+          acessar o sistema.
+        </p>
+        <button class="btn" id="btn-access">Acessar Sistema</button>
+      </div>
+
+      <div id="error" style="display: none">
+        <h1 class="error">❌ Erro na Confirmação</h1>
+        <p id="errorMessage"></p>
+        <button class="btn" id="btn-back">Voltar ao Site</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { supabase } from "./assets/js/supabaseClient.js";
+
+      // Exibir sucesso
+      function showSuccess() {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("success").style.display = "block";
+      }
+
+      // Exibir erro
+      function showError(message) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("success").style.display = "none";
+        document.getElementById("error").style.display = "block";
+        document.getElementById("errorMessage").textContent = message;
+      }
+
+      // Botões
+      document.getElementById("btn-access").addEventListener("click", () => {
+        // Ajuste para a url do seu painel
+        window.location.href = "https://sarmtech.netlify.app/";
+      });
+      document.getElementById("btn-back").addEventListener("click", () => {
+        window.location.href = "https://sarmtech.netlify.app/";
+      });
+
+      // Função principal
+      async function processConfirmation() {
+        try {
+          console.log("🔍 Iniciando processamento de confirmação...");
+
+          const params = new URLSearchParams(window.location.search);
+          const token_hash = params.get("token_hash");
+          const type = params.get("type");
+          const errorParam = params.get("error");
+          const errorDescription = params.get("error_description");
+
+          // Se Supabase redirecionou com ?error=... mostramos o erro
+          if (errorParam) {
+            const decoded = errorDescription
+              ? decodeURIComponent(errorDescription.replace(/\+/g, " "))
+              : "Erro no processo de confirmação";
+            console.warn(
+              "❌ Supabase retornou erro de autenticação:",
+              errorParam,
+              decoded
+            );
+            showError(`Erro do servidor: ${decoded}`);
+            return;
+          }
+
+          // Se veio token_hash (fluxo normal de confirmação)
+          if (token_hash && type) {
+            console.log(
+              "🔄 Confirmando com token_hash:",
+              token_hash,
+              "type:",
+              type
+            );
+
+            const { data, error } = await supabase.auth.verifyOtp({
+              token_hash: token_hash,
+              type: type,
+            });
+
+            if (error) {
+              console.error("❌ verifyOtp retornou erro:", error);
+              throw new Error(error.message || "Erro ao confirmar conta");
+            }
+
+            console.log("✅ Confirmado com verifyOtp:", data);
+
+            // opcional: buscar usuário e confirmar campo
+            try {
+              const { data: userData } = await supabase.auth.getUser();
+              console.log("🔎 Usuário após confirmação:", userData);
+            } catch (e) {
+              console.warn(
+                "⚠️ Falha ao buscar user após confirmação (não crítico):",
+                e
+              );
+            }
+
+            showSuccess();
+            return;
+          }
+
+          // Se não veio token_hash: verificar sessão (caso o Supabase já tenha trocado por sessão)
+          console.log("ℹ️ token_hash ausente — verificando sessão ativa...");
+          const { data: sessionData, error: sessionError } =
+            await supabase.auth.getSession();
+
+          if (sessionError) {
+            console.error("❌ Erro ao obter sessão:", sessionError);
+            throw new Error(
+              "Erro ao verificar sessão: " + sessionError.message
+            );
+          }
+
+          const session = sessionData?.session;
+          if (session?.user) {
+            // verificar campo de confirmação no usuário
+            const { data: userResponse, error: userError } =
+              await supabase.auth.getUser();
+            if (userError) {
+              console.warn("⚠️ Erro ao obter usuário:", userError);
+            }
+            const confirmedAt = userResponse?.user?.confirmed_at;
+            if (confirmedAt) {
+              console.log("🎉 Email já confirmado em:", confirmedAt);
+              showSuccess();
+              return;
+            } else {
+              throw new Error(
+                "Sessão detectada, mas email ainda não confirmado."
+              );
+            }
+          }
+
+          // Se chegar aqui, não há token e não há sessão
+          throw new Error(
+            "Link inválido ou expirado. Refaça o cadastro para receber novo e-mail."
+          );
+        } catch (err) {
+          console.error("❌ Erro no processamento:", err);
+          showError("Falha na confirmação: " + (err?.message || String(err)));
+        }
+      }
+
+      // Executa ao carregar
+      document.addEventListener("DOMContentLoaded", processConfirmation);
+    </script>
+  </body>
+</html>
