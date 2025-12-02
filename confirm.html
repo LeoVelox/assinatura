@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Confirmação de Cadastro - SarmTech</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmando Email - SarmTech</title>
     <style>
       body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #f5f5f5;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100vh;
       }
       .container {
-        background: #fff;
-        padding: 36px;
-        border-radius: 12px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-        max-width: 480px;
-        width: 95%;
-        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        color: #333;
       }
       .success {
         color: #28a745;
@@ -33,100 +34,106 @@
       .loading {
         color: #007bff;
       }
-      .btn {
-        margin-top: 20px;
-        padding: 12px 16px;
-        border-radius: 8px;
-        border: 0;
-        background: #007bff;
-        color: #fff;
+      button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
         font-size: 16px;
         cursor: pointer;
+        margin-top: 20px;
         width: 100%;
+      }
+      button:hover {
+        background: #5a67d8;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div id="loading">
-        <h1 class="loading">Confirmando seu cadastro...</h1>
-        <p>Processando sua confirmação, aguarde um momento.</p>
+        <h1 class="loading">⏳ Processando confirmação...</h1>
+        <p>Aguarde enquanto confirmamos seu email.</p>
       </div>
 
       <div id="success" style="display: none">
-        <h1 class="success">✅ Cadastro Confirmado!</h1>
-        <p>Seu trial de <strong>30 dias</strong> foi ativado com sucesso!</p>
+        <h1 class="success">✅ Email Confirmado!</h1>
+        <p>Seu cadastro foi confirmado com sucesso!</p>
+        <p>Seu trial de 30 dias está ativo. Agora você pode fazer login.</p>
         <button
-          class="btn"
-          onclick="window.location.href='https://sarm-tech.netlify.app/app'"
+          onclick="window.location.href='https://sarm-tech.netlify.app/login.html'"
         >
-          Acessar Sistema
+          Ir para Login
         </button>
       </div>
 
       <div id="error" style="display: none">
         <h1 class="error">❌ Erro na Confirmação</h1>
-        <p id="errorMessage"></p>
-        <button
-          class="btn"
-          onclick="window.location.href='https://sarm-tech.netlify.app'"
-        >
+        <p id="errorText"></p>
+        <button onclick="window.location.href='https://sarm-tech.netlify.app'">
           Voltar ao Site
         </button>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      // Inicializa o Supabase
-      const supabaseUrl = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
-      const supabaseKey =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+      // Função para extrair parâmetros da URL
+      function getUrlParams() {
+        const params = {};
+        const hash = window.location.hash.substring(1);
+        const query = window.location.search.substring(1);
+        const combined = hash + "&" + query;
 
-      // Função principal
+        combined.split("&").forEach((pair) => {
+          const [key, value] = pair.split("=");
+          if (key && value) {
+            params[key] = decodeURIComponent(value);
+          }
+        });
+
+        return params;
+      }
+
       async function handleConfirmation() {
         try {
-          console.log("🔍 Verificando hash da URL...");
+          console.log("🔍 Analisando URL...");
+          const params = getUrlParams();
+          console.log("📊 Parâmetros encontrados:", params);
 
-          // O Magic Link já processa automaticamente
-          const { data, error } = await supabase.auth.getSession();
+          // Verifica se é um link de confirmação do Supabase
+          if (params.type === "signup" || params.access_token) {
+            // Magic Link do Supabase já processou automaticamente
+            console.log("✅ Link de confirmação detectado");
 
-          if (error) throw error;
-
-          if (data.session) {
-            console.log(
-              "✅ Usuário confirmado e autenticado!",
-              data.session.user
-            );
-            showSuccess();
+            // Espera um pouco para garantir processamento
+            setTimeout(() => {
+              showSuccess();
+            }, 1500);
           } else {
-            // Se não tem sessão, talvez o link já foi processado
-            console.log("ℹ️ Sem sessão ativa, verificando estado...");
-            showSuccess("Seu email já foi confirmado anteriormente!");
+            throw new Error("Link de confirmação inválido");
           }
         } catch (error) {
           console.error("❌ Erro:", error);
-          showError(error.message || "Erro ao confirmar o email.");
+          showError(error.message || "Não foi possível confirmar seu email.");
         }
       }
 
-      function showSuccess(
-        message = "Seu email foi confirmado com sucesso! Seu trial de 30 dias está ativo."
-      ) {
+      function showSuccess() {
         document.getElementById("loading").style.display = "none";
         document.getElementById("error").style.display = "none";
         document.getElementById("success").style.display = "block";
-        if (message) {
-          document.querySelector("#success p").textContent = message;
-        }
+
+        // Salva no localStorage que o email foi confirmado
+        localStorage.setItem("email_confirmed", "true");
+        localStorage.setItem("confirmation_time", new Date().toISOString());
       }
 
       function showError(message) {
         document.getElementById("loading").style.display = "none";
         document.getElementById("success").style.display = "none";
         document.getElementById("error").style.display = "block";
-        document.getElementById("errorMessage").textContent = message;
+        document.getElementById("errorText").textContent = message;
       }
 
       // Inicia quando a página carrega
