@@ -116,8 +116,15 @@
 
     <script>
       async function processConfirmation() {
+        console.log("=== DEBUG INICIADO ===");
+        console.log("URL completa:", window.location.href);
+
         try {
           console.log("🚀 Processando confirmação...");
+          console.log("🧪 Testando conexão com Supabase...");
+          const { data: testData, error: testError } =
+            await client.auth.getSession();
+          console.log("Teste de sessão:", { testData, testError });
 
           // Captura parâmetros
           const urlParams = new URLSearchParams(window.location.search);
@@ -171,6 +178,8 @@
           // Sucesso!
           showSuccess();
         } catch (error) {
+          console.error("=== ERRO COMPLETO ===", err);
+          console.error("Stack:", err.stack);
           console.error("❌ Erro detalhado:", error);
           showError(
             error.message || "Erro ao confirmar o email. Tente novamente."
