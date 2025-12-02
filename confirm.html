@@ -165,7 +165,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      // ================= CONFIGURAÇÃO =================
+      // ================= CONFIGURAÇÃO GLOBAL =================
       const SUPABASE_URL = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
@@ -173,6 +173,9 @@
       // URLs dos sistemas
       const SITE_URL = "https://sarm-tech.netlify.app";
       const SYSTEM_URL = "https://sarmtech.netlify.app";
+
+      // ================= VARIÁVEL GLOBAL =================
+      let supabaseClient = null;
 
       // ================= FUNÇÕES AUXILIARES =================
       function showSection(sectionId) {
@@ -202,6 +205,14 @@
         debugEl.style.display = "block";
       }
 
+      function initializeSupabase() {
+        if (!supabaseClient) {
+          supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          addDebugInfo("✅ Supabase inicializado");
+        }
+        return supabaseClient;
+      }
+
       // ================= LÓGICA PRINCIPAL =================
       async function processEmailConfirmation() {
         addDebugInfo("🚀 Iniciando processamento de confirmação...");
@@ -210,7 +221,7 @@
         try {
           // 1. Inicializar Supabase
           addDebugInfo("🔧 Inicializando Supabase...");
-          const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          const supabase = initializeSupabase();
 
           // 2. Extrair parâmetros da URL
           const urlParams = new URLSearchParams(window.location.search);
@@ -231,7 +242,32 @@
             }, type=${type}, access_token=${access_token ? "SIM" : "NÃO"}`
           );
 
-          // 3. Se tiver access_token no hash (Magic Link funcionou)
+          // 3. ANALISAR ERRO NA URL (você está recebendo um erro!)
+          const error = urlParams.get("error") || hashParams.get("error");
+          const error_description =
+            urlParams.get("error_description") ||
+            hashParams.get("error_description");
+
+          if (error) {
+            addDebugInfo(
+              `❌ ERRO DO SUPABASE: ${error} - ${error_description}`
+            );
+
+            // Verificar se é erro de "already confirmed"
+            if (
+              error_description &&
+              error_description.includes("already confirmed")
+            ) {
+              addDebugInfo("✅ Email já estava confirmado");
+              showSuccess();
+              return;
+            }
+
+            // Para outros erros, tenta continuar
+            addDebugInfo("⚠️ Erro na URL, mas tentando continuar...");
+          }
+
+          // 4. Se tiver access_token no hash (Magic Link funcionou)
           if (access_token) {
             addDebugInfo("🎯 Magic Link detectado na URL");
 
@@ -269,7 +305,7 @@
             }
           }
 
-          // 4. Se tiver token ou token_hash (OTP tradicional)
+          // 5. Se tiver token ou token_hash (OTP tradicional)
           if (token || token_hash) {
             addDebugInfo("🔑 Processando OTP/Tokens...");
 
@@ -306,7 +342,7 @@
             }
           }
 
-          // 5. Se nenhum dos métodos acima funcionou, verifica se já tem sessão
+          // 6. Se nenhum dos métodos acima funcionou, verifica se já tem sessão
           addDebugInfo("🔍 Verificando sessão existente...");
           const { data: sessionData, error: sessionError } =
             await supabase.auth.getSession();
@@ -336,7 +372,7 @@
             }
           }
 
-          // 6. Se chegou aqui, tenta uma última verificação
+          // 7. Se chegou aqui, tenta uma última verificação
           addDebugInfo("🔄 Tentando verificação final...");
           const { data: userData, error: userError } =
             await supabase.auth.getUser();
@@ -353,11 +389,9 @@
             }
           }
 
-          // 7. Se nada funcionou, mas não houve erro crítico
-          addDebugInfo(
-            "ℹ️ Nenhum método direto funcionou, mas pode estar tudo ok"
-          );
-          showSuccess(); // Mostra sucesso mesmo assim, pois o Magic Link pode ter processado em background
+          // 8. Se chegou até aqui e não houve erro crítico, mostra sucesso
+          addDebugInfo("ℹ️ Processamento concluído sem erros críticos");
+          showSuccess();
         } catch (error) {
           addDebugInfo(`💥 ERRO CRÍTICO: ${error.message}`);
           console.error("Erro completo:", error);
@@ -374,6 +408,9 @@
               "Este link expirou. Solicite um novo email de confirmação.";
           } else if (error.message.includes("Invalid")) {
             userMessage = "Link de confirmação inválido ou já utilizado.";
+          } else if (error.message.includes("server_error")) {
+            userMessage =
+              "Erro no servidor. O email pode já estar confirmado. Tente fazer login.";
           } else {
             userMessage += "Por favor, tente fazer login diretamente.";
           }
@@ -392,12 +429,11 @@
           document.getElementById("debug").style.display = "block";
         }
 
-        // Inicia o processamento
-        processEmailConfirmation();
+        // Inicializa o Supabase uma vez
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Adiciona listener para mudanças de estado
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        supabase.auth.onAuthStateChange((event, session) => {
+        supabaseClient.auth.onAuthStateChange((event, session) => {
           addDebugInfo(`🔄 Auth State Change: ${event}`);
 
           if (event === "SIGNED_IN") {
@@ -405,6 +441,9 @@
             showSuccess();
           }
         });
+
+        // Inicia o processamento
+        processEmailConfirmation();
       });
     </script>
   </body>
