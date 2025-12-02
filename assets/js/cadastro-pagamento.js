@@ -245,6 +245,7 @@ async function createTrialAccount() {
 
     // 3. Criar usuário no Supabase Auth
     console.log("Criando usuário no Auth...");
+    console.log("🔧 Client criado:", !!client);
     const { data: authResult, error: signUpError } = await supabase.auth.signUp(
       {
         email: userData.email,
