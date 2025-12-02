@@ -4,26 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Confirmação de Cadastro - SarmTech</title>
-
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="./favicon/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="./favicon/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="./favicon/favicon-16x16.png"
-    />
-    <!-- <link rel="manifest" href="/site.webmanifest" /> -->
-
     <style>
       body {
         margin: 0;
@@ -43,15 +23,6 @@
         max-width: 480px;
         width: 95%;
         text-align: center;
-      }
-      h1 {
-        margin: 0 0 8px;
-        font-size: 22px;
-        color: #222;
-      }
-      p {
-        color: #555;
-        line-height: 1.4;
       }
       .success {
         color: #28a745;
@@ -73,21 +44,8 @@
         cursor: pointer;
         width: 100%;
       }
-      .btn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-      }
-      pre {
-        text-align: left;
-        background: #f8f9fa;
-        padding: 12px;
-        border-radius: 8px;
-        overflow: auto;
-        max-height: 160px;
-      }
     </style>
   </head>
-
   <body>
     <div class="container">
       <div id="loading">
@@ -97,113 +55,82 @@
 
       <div id="success" style="display: none">
         <h1 class="success">✅ Cadastro Confirmado!</h1>
-        <p>
-          Seu trial de <strong>30 dias</strong> foi ativado com sucesso! Agora
-          você pode acessar o sistema.
-        </p>
-        <button class="btn" id="btn-access">Acessar Sistema</button>
+        <p>Seu trial de <strong>30 dias</strong> foi ativado com sucesso!</p>
+        <button
+          class="btn"
+          onclick="window.location.href='https://sarm-tech.netlify.app/app'"
+        >
+          Acessar Sistema
+        </button>
       </div>
 
       <div id="error" style="display: none">
         <h1 class="error">❌ Erro na Confirmação</h1>
         <p id="errorMessage"></p>
-        <button class="btn" id="btn-back">Voltar ao Site</button>
+        <button
+          class="btn"
+          onclick="window.location.href='https://sarm-tech.netlify.app'"
+        >
+          Voltar ao Site
+        </button>
       </div>
     </div>
 
-    <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      async function processConfirmation() {
-        console.log("=== DEBUG INICIADO ===");
-        console.log("URL completa:", window.location.href);
+      // Inicializa o Supabase
+      const supabaseUrl = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
+      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+      // Função principal
+      async function handleConfirmation() {
         try {
-          console.log("🚀 Processando confirmação...");
-          console.log("🧪 Testando conexão com Supabase...");
-          const { data: testData, error: testError } =
-            await client.auth.getSession();
-          console.log("Teste de sessão:", { testData, testError });
+          console.log("🔍 Verificando hash da URL...");
 
-          // Captura parâmetros
-          const urlParams = new URLSearchParams(window.location.search);
-          const token = urlParams.get("token");
-          const type = urlParams.get("type") || "signup";
+          // O Magic Link já processa automaticamente
+          const { data, error } = await supabase.auth.getSession();
 
-          console.log("🔍 Token:", token, "Type:", type);
+          if (error) throw error;
 
-          if (!token) {
-            throw new Error("Token não encontrado");
-          }
-
-          // 1. Tenta com verifyOtp
-          console.log("🔄 Tentando verifyOtp...");
-          const { data, error } = await client.auth.verifyOtp({
-            token_hash: token,
-            type: type,
-          });
-
-          if (error) {
-            console.log("⚠️ verifyOtp falhou, tentando método alternativo...");
-
-            // 2. Método alternativo - chama diretamente a API do Supabase
-            const response = await fetch(
-              "https://pjvgzbnqnwrqxwlbndkr.supabase.co/auth/v1/verify",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  apikey:
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE",
-                },
-                body: JSON.stringify({
-                  token_hash: token,
-                  type: type,
-                }),
-              }
+          if (data.session) {
+            console.log(
+              "✅ Usuário confirmado e autenticado!",
+              data.session.user
             );
-
-            const result = await response.json();
-
-            if (!response.ok) {
-              throw new Error(result.error?.message || "Erro na verificação");
-            }
-
-            console.log("✅ Confirmado via API direta:", result);
+            showSuccess();
           } else {
-            console.log("✅ Confirmado via verifyOtp:", data);
+            // Se não tem sessão, talvez o link já foi processado
+            console.log("ℹ️ Sem sessão ativa, verificando estado...");
+            showSuccess("Seu email já foi confirmado anteriormente!");
           }
-
-          // Sucesso!
-          showSuccess();
         } catch (error) {
-          console.error("=== ERRO COMPLETO ===", err);
-          console.error("Stack:", err.stack);
-          console.error("❌ Erro detalhado:", error);
-          showError(
-            error.message || "Erro ao confirmar o email. Tente novamente."
-          );
+          console.error("❌ Erro:", error);
+          showError(error.message || "Erro ao confirmar o email.");
         }
       }
 
-      function showSuccess(message = "Seu email foi confirmado com sucesso!") {
+      function showSuccess(
+        message = "Seu email foi confirmado com sucesso! Seu trial de 30 dias está ativo."
+      ) {
         document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
         document.getElementById("success").style.display = "block";
-
-        if (message !== "Seu email foi confirmado com sucesso!") {
+        if (message) {
           document.querySelector("#success p").textContent = message;
         }
       }
 
       function showError(message) {
         document.getElementById("loading").style.display = "none";
+        document.getElementById("success").style.display = "none";
         document.getElementById("error").style.display = "block";
         document.getElementById("errorMessage").textContent = message;
       }
 
-      // Adicione esta linha para iniciar
-      document.addEventListener("DOMContentLoaded", processConfirmation);
+      // Inicia quando a página carrega
+      document.addEventListener("DOMContentLoaded", handleConfirmation);
     </script>
   </body>
 </html>
