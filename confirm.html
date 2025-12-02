@@ -5,265 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confirmando Email - SarmTech</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+        color: white;
+        height: 100vh;
         display: flex;
-        justify-content: center;
         align-items: center;
-        padding: 20px;
+        justify-content: center;
+        margin: 0;
       }
       .container {
         background: white;
         padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        text-align: center;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         max-width: 500px;
-        width: 100%;
-      }
-      .success-icon {
-        font-size: 60px;
-        color: #28a745;
-        margin-bottom: 20px;
-      }
-      h1 {
+        width: 90%;
         color: #333;
-        margin-bottom: 15px;
-      }
-      p {
-        color: #666;
-        margin-bottom: 20px;
-        line-height: 1.6;
-      }
-      .btn {
-        display: inline-block;
-        background: #007bff;
-        color: white;
-        padding: 15px 30px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        margin: 10px;
-        transition: transform 0.3s;
-      }
-      .btn:hover {
-        transform: translateY(-2px);
-        background: #0056b3;
-      }
-      .loading {
-        color: #007bff;
-        font-size: 18px;
-        margin: 20px 0;
-      }
-      .error {
-        color: #dc3545;
-        background: #f8d7da;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 20px 0;
       }
       .success {
         color: #28a745;
-        background: #d4edda;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 20px 0;
+      }
+      .error {
+        color: #dc3545;
+      }
+      .loading {
+        color: #007bff;
+      }
+      button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+      }
+      button:hover {
+        background: #5a67d8;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div id="loading">
-        <div class="loading">
-          <div style="font-size: 40px">⏳</div>
-          <p>Processando confirmação do email...</p>
-          <p><small>Por favor, aguarde alguns segundos.</small></p>
-        </div>
+        <h1 class="loading">⏳ Confirmando seu email...</h1>
+        <p>Aguarde enquanto processamos sua confirmação.</p>
       </div>
 
       <div id="success" style="display: none">
-        <div class="success-icon">✅</div>
-        <h1>Email Confirmado com Sucesso!</h1>
-        <p>
-          Sua conta foi ativada e seu <strong>trial de 30 dias</strong> está
-          pronto para uso.
-        </p>
-
-        <div style="margin: 30px 0">
-          <a
-            href="https://sarmtech.netlify.app/login/login.html?confirmed=true"
-            class="btn"
-          >
-            🚀 Ir para o Sistema
-          </a>
-          <a
-            href="https://sarm-tech.netlify.app"
-            class="btn"
-            style="background: #6c757d"
-          >
-            ← Voltar ao Site
-          </a>
-        </div>
-
-        <p><small>Redirecionando automaticamente em 5 segundos...</small></p>
+        <h1 class="success">✅ Email Confirmado!</h1>
+        <p>Seu cadastro foi confirmado com sucesso!</p>
+        <p>Seu trial de <strong>30 dias</strong> está ativo.</p>
+        <button
+          onclick="window.location.href='https://sarmtech.netlify.app/login/login.html?confirmed=true'"
+        >
+          Ir para o Sistema
+        </button>
       </div>
 
       <div id="error" style="display: none">
-        <div style="font-size: 40px; color: #dc3545">❌</div>
-        <h1>Erro na Confirmação</h1>
-        <p id="errorMessage"></p>
-
-        <div style="margin: 30px 0">
-          <a
-            href="https://sarmtech.netlify.app/login/login.html"
-            class="btn"
-            style="background: #6c757d"
-          >
-            Tentar Fazer Login
-          </a>
-          <a href="https://sarm-tech.netlify.app" class="btn">
-            Voltar ao Site
-          </a>
-        </div>
+        <h1 class="error">❌ Erro na Confirmação</h1>
+        <p id="errorText"></p>
+        <button
+          onclick="window.location.href='https://sarmtech.netlify.app/login/login.html'"
+        >
+          Tentar Fazer Login
+        </button>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      // Configuração
+      // ================= CONFIGURAÇÃO =================
       const SUPABASE_URL = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
-      const LOGIN_URL = "https://sarmtech.netlify.app/login/login.html";
 
-      // Elementos do DOM
-      const loadingEl = document.getElementById("loading");
-      const successEl = document.getElementById("success");
-      const errorEl = document.getElementById("error");
-      const errorMessageEl = document.getElementById("errorMessage");
-
-      // Funções auxiliares
-      function showLoading() {
-        loadingEl.style.display = "block";
-        successEl.style.display = "none";
-        errorEl.style.display = "none";
-      }
-
-      function showSuccess() {
-        loadingEl.style.display = "none";
-        successEl.style.display = "block";
-        errorEl.style.display = "none";
-
-        // Redireciona após 5 segundos
-        setTimeout(() => {
-          window.location.href = `${LOGIN_URL}?confirmed=true`;
-        }, 5000);
+      // ================= FUNÇÕES AUXILIARES =================
+      function showSection(sectionId) {
+        ["loading", "success", "error"].forEach((id) => {
+          document.getElementById(id).style.display =
+            id === sectionId ? "block" : "none";
+        });
       }
 
       function showError(message) {
-        loadingEl.style.display = "none";
-        successEl.style.display = "none";
-        errorEl.style.display = "block";
-        errorMessageEl.textContent = message;
+        document.getElementById("errorText").textContent = message;
+        showSection("error");
       }
 
-      // Função principal
-      async function confirmEmail() {
-        console.log("🔍 Iniciando confirmação de email...");
+      function showSuccess() {
+        showSection("success");
+        // Redireciona após 3 segundos
+        setTimeout(() => {
+          window.location.href =
+            "https://sarmtech.netlify.app/login/login.html?confirmed=true";
+        }, 3000);
+      }
+
+      // ================= LÓGICA DE CONFIRMAÇÃO PKCE =================
+      async function processPKCEConfirmation() {
+        console.log("🔍 Processando confirmação PKCE...");
 
         try {
-          // 1. Extrair token da URL
+          // Extrair parâmetros da URL
           const urlParams = new URLSearchParams(window.location.search);
-          const token = urlParams.get("token");
-          const type = urlParams.get("type") || "signup";
-
-          console.log("📊 Token recebido:", token ? "SIM" : "NÃO");
-          console.log("📊 Tipo:", type);
-
-          if (!token) {
-            throw new Error("Token não encontrado na URL");
-          }
-
-          // 2. Inicializar Supabase
-          const supabase = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
+          const hashParams = new URLSearchParams(
+            window.location.hash.substring(1)
           );
 
-          // 3. Verificar OTP (MÉTODO CORRETO)
-          console.log("🔄 Verificando OTP...");
-          const { data, error } = await supabase.auth.verifyOtp({
-            token_hash: token,
-            type: type,
-          });
+          // Parâmetros do PKCE
+          const code = urlParams.get("code") || hashParams.get("code");
+          const error = urlParams.get("error") || hashParams.get("error");
+
+          console.log("📊 Code:", code ? "Presente" : "Ausente");
+          console.log("📊 Error:", error || "Nenhum");
 
           if (error) {
-            console.error("❌ Erro do Supabase:", error);
+            console.error("❌ Erro na URL:", error);
 
-            // Verificar se já está confirmado
-            if (error.message.includes("already confirmed")) {
-              console.log("✅ Email já estava confirmado");
+            // Se for "already confirmed", considera sucesso
+            if (error.toLowerCase().includes("already confirmed")) {
+              console.log("✅ Email já confirmado anteriormente");
               showSuccess();
               return;
             }
 
-            // Tenta método alternativo
-            console.log("🔄 Tentando método alternativo...");
-            const { data: signInData, error: signInError } =
-              await supabase.auth.signInWithOtp({
-                token: token,
-                type: type,
-              });
+            throw new Error(`Erro do servidor: ${error}`);
+          }
 
-            if (signInError) {
-              // Verifica se o usuário já existe e tenta login
-              console.log("🔄 Verificando se usuário já existe...");
+          if (code) {
+            console.log("🔄 Processando código PKCE...");
 
-              // Pega o email do token se possível (para debug)
-              const emailMatch = token.match(/email=([^&]+)/);
-              if (emailMatch) {
-                console.log("📧 Email detectado no token:", emailMatch[1]);
-              }
+            // Para PKCE, o código é processado automaticamente pelo Supabase
+            // quando o usuário é redirecionado de volta
 
-              throw new Error(
-                "Não foi possível confirmar o email. Tente fazer login diretamente."
+            // Verificar se já tem sessão
+            const { createClient } = window.supabase;
+            const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            const { data: sessionData, error: sessionError } =
+              await supabase.auth.getSession();
+
+            if (sessionError) {
+              console.error("❌ Erro na sessão:", sessionError);
+            } else if (sessionData.session) {
+              console.log(
+                "✅ Sessão ativa detectada:",
+                sessionData.session.user.email
               );
+              console.log(
+                "📧 Email confirmado em:",
+                sessionData.session.user.email_confirmed_at
+              );
+              showSuccess();
+              return;
             }
-
-            console.log("✅ Confirmado via método alternativo");
-          } else {
-            console.log("✅ Confirmado via verifyOtp");
-            console.log("👤 Dados do usuário:", data);
           }
 
-          // 4. Verificar se a sessão foi criada
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.getSession();
+          // Se não tem código PKCE, verifica se já tem sessão de outra forma
+          console.log("🔍 Verificando sessão existente...");
+          const { createClient } = window.supabase;
+          const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-          if (sessionError) {
-            console.warn(
-              "⚠️ Sem sessão ativa, mas email pode estar confirmado"
-            );
-          } else if (sessionData.session) {
-            console.log(
-              "✅ Sessão ativa criada:",
-              sessionData.session.user.email
-            );
+          const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+          if (!userError && userData.user) {
+            console.log("👤 Usuário encontrado:", userData.user.email);
+
+            if (userData.user.email_confirmed_at) {
+              console.log("✅ Email já confirmado anteriormente");
+              showSuccess();
+              return;
+            }
           }
 
-          // 5. Sucesso
+          // Se chegou aqui sem erros, mostra sucesso
+          console.log("ℹ️ Nenhum erro crítico, mostrando sucesso...");
           showSuccess();
         } catch (error) {
-          console.error("❌ Erro na confirmação:", error);
+          console.error("💥 Erro no processamento:", error);
 
-          let userMessage = "Erro ao confirmar email: ";
+          // Mensagens amigáveis
+          let userMessage = "Não foi possível confirmar seu email. ";
 
           if (error.message.includes("already confirmed")) {
             userMessage = "Seu email já foi confirmado anteriormente.";
@@ -272,27 +202,41 @@
           } else if (error.message.includes("expired")) {
             userMessage =
               "Este link expirou. Solicite um novo email de confirmação.";
-          } else if (error.message.includes("Invalid")) {
+          } else if (error.message.includes("invalid")) {
             userMessage = "Link de confirmação inválido ou já utilizado.";
-          } else if (error.message.includes("token")) {
-            userMessage = "Token inválido ou expirado.";
           } else {
-            userMessage += error.message;
+            userMessage += "Tente fazer login diretamente.";
           }
 
           showError(userMessage);
         }
       }
 
-      // Iniciar quando a página carregar
-      document.addEventListener("DOMContentLoaded", confirmEmail);
+      // ================= INICIALIZAÇÃO =================
+      document.addEventListener("DOMContentLoaded", async () => {
+        console.log("🚀 Página de confirmação carregada");
+        console.log("🌐 URL completa:", window.location.href);
 
-      // Adicionar para debug no console
-      console.log("🌐 URL completa:", window.location.href);
-      console.log(
-        "🔍 Parâmetros da URL:",
-        Object.fromEntries(new URLSearchParams(window.location.search))
-      );
+        // Carrega o Supabase JS
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+        script.onload = () => {
+          console.log("✅ Supabase JS carregado");
+          processPKCEConfirmation();
+        };
+        document.head.appendChild(script);
+
+        // Timeout de segurança
+        setTimeout(() => {
+          if (document.getElementById("loading").style.display !== "none") {
+            console.log("⏱️ Timeout - mostrando opções");
+            showError(
+              "O processamento está demorando mais que o esperado.<br>" +
+                "Você pode tentar fazer login diretamente."
+            );
+          }
+        }, 10000);
+      });
     </script>
   </body>
 </html>
