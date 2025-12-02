@@ -1,4 +1,4 @@
-// assets/js/cadastro-pagamento.js - VERSÃO CORRIGIDA COM PLANO TRIAL ID 0
+// assets/js/cadastro-pagamento.js - VERSÃO SEM CONFIRMAÇÃO DE EMAIL
 
 import { supabase } from "./supabaseClient.js";
 
@@ -6,7 +6,7 @@ let userData = {};
 
 // Inicialização
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("🚀 Página de cadastro Trial carregada");
+  console.log("🚀 Página de cadastro Trial carregada - SEM CONFIRMAÇÃO");
 
   try {
     // Configurar toggle de senha
@@ -209,7 +209,7 @@ async function validateAndCreateTrial() {
   await createTrialAccount();
 }
 
-// Criar conta trial
+// Criar conta trial (SIMPIFICADO - SEM CONFIRMAÇÃO)
 async function createTrialAccount() {
   const btnCadastrar = document.getElementById("btn-cadastrar");
   const submitText = btnCadastrar?.querySelector(".submit-text");
@@ -221,7 +221,7 @@ async function createTrialAccount() {
   if (spinner) spinner.classList.remove("d-none");
 
   try {
-    console.log("🎯 Criando conta Trial...");
+    console.log("🎯 Criando conta Trial (SEM CONFIRMAÇÃO)...");
 
     // 1. Verificar se email já existe
     const { data: emailCheck, error: emailError } = await supabase
@@ -243,7 +243,7 @@ async function createTrialAccount() {
     if (lookupError) throw lookupError;
     if (existingUser) throw new Error("Este CPF/CNPJ já está cadastrado");
 
-    // 3. Criar usuário no Supabase Auth
+    // 3. Criar usuário no Supabase Auth (SIMPIFICADO)
     console.log("Criando usuário no Auth...");
     const { data: authResult, error: signUpError } = await supabase.auth.signUp(
       {
@@ -255,6 +255,7 @@ async function createTrialAccount() {
             cpf_cnpj: userData.cpfCnpj,
             phone: userData.phone,
           },
+          // SEM emailRedirectTo - SEM CONFIRMAÇÃO
         },
       }
     );
@@ -262,26 +263,49 @@ async function createTrialAccount() {
     if (signUpError) {
       console.error("Erro no Auth:", signUpError);
 
-      // Tratar erros específicos do Auth
+      // Se for erro de email já registrado, tenta fazer login
+      if (
+        signUpError.message.includes("already registered") ||
+        signUpError.message.includes("User already registered")
+      ) {
+        console.log("Usuário já existe, tentando login...");
+
+        const { data: loginData, error: loginError } =
+          await supabase.auth.signInWithPassword({
+            email: userData.email,
+            password: userData.password,
+          });
+
+        if (loginError) {
+          throw new Error(
+            "Este email já está cadastrado. Use 'Esqueci minha senha' ou faça login."
+          );
+        }
+
+        // Login bem-sucedido - usuário já existe
+        console.log("✅ Login realizado com sucesso");
+        showSuccessModal(true); // Passa true para indicar que é login
+        return;
+      }
+
+      // Outros erros
       if (signUpError.message.includes("Email rate limit exceeded")) {
-        throw new Error(
-          "Muitas tentativas. Aguarde alguns minutos e tente novamente."
-        );
+        throw new Error("Muitas tentativas. Aguarde alguns minutos.");
       } else if (signUpError.message.includes("Invalid email")) {
-        throw new Error("Email inválido. Verifique o endereço informado.");
+        throw new Error("Email inválido.");
       } else if (signUpError.message.includes("Password")) {
-        throw new Error("A senha não atende aos requisitos de segurança.");
+        throw new Error("Senha muito fraca. Use uma senha mais forte.");
       } else {
-        throw new Error(`Erro de autenticação: ${signUpError.message}`);
+        throw new Error(`Erro: ${signUpError.message}`);
       }
     }
 
     if (!authResult.user) {
-      throw new Error("Não foi possível criar o usuário. Tente novamente.");
+      throw new Error("Não foi possível criar o usuário.");
     }
 
     const userId = authResult.user.id;
-    console.log("✅ Usuário Auth criado:", userId);
+    console.log("✅ Usuário criado (SEM CONFIRMAÇÃO NECESSÁRIA):", userId);
 
     // 4. Criar perfil do usuário com plano Trial (ID 0)
     const { error: profileError } = await supabase
@@ -300,24 +324,12 @@ async function createTrialAccount() {
 
     if (profileError) {
       console.error("Erro ao criar perfil:", profileError);
-
-      // Se der erro no perfil, tentar criar company_profile também
-      await supabase.from("company_profiles").upsert({
-        user_id: userId,
-        name: userData.fullName,
-        email: userData.email,
-        phone: userData.phone,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-
-      throw new Error("Perfil criado parcialmente. Você pode fazer login.");
+      // Continua mesmo com erro no perfil
     }
 
-    // 5. Criar company_profile
-    const { error: companyError } = await supabase
-      .from("company_profiles")
-      .upsert({
+    // 5. Criar company_profile (opcional)
+    try {
+      await supabase.from("company_profiles").upsert({
         user_id: userId,
         name: userData.fullName + " - Empresa",
         email: userData.email,
@@ -325,76 +337,51 @@ async function createTrialAccount() {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
-
-    if (companyError) {
-      console.warn("Aviso ao criar company_profile:", companyError);
-      // Não impede a criação da conta
+    } catch (companyError) {
+      console.warn("Aviso company_profile:", companyError);
     }
 
     // 6. Criar assinatura trial
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 30); // 30 dias de trial
+    try {
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 30);
 
-    const { data: subscription, error: subError } = await supabase
-      .from("subscriptions")
-      .insert({
+      await supabase.from("subscriptions").insert({
         user_id: userId,
-        plan_id: 0, // Plano Trial ID 0
+        plan_id: 0,
         status: "trialing",
         payment_method: "trial",
         current_period_start: new Date().toISOString(),
         current_period_end: trialEnd.toISOString(),
-        is_test: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
-    if (subError) {
-      console.warn("Aviso ao criar assinatura:", subError);
-      // Não impede a criação da conta principal
+      });
+    } catch (subError) {
+      console.warn("Aviso assinatura:", subError);
     }
 
-    console.log("✅ Conta Trial criada com sucesso!");
+    console.log("✅ Conta Trial criada com sucesso! (PRONTA PARA LOGIN)");
 
-    // 7. Sucesso - mostrar mensagem detalhada
-    const successMessage = `
-        🎉 <strong>Conta criada com sucesso!</strong>
+    // 7. Tenta fazer login automaticamente
+    try {
+      const { data: loginData, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email: userData.email,
+          password: userData.password,
+        });
 
-      <div style="text-align: left; margin: 15px 0;">
-        <p>✅ <strong>Seu Trial de 15 dias foi ativado</strong></p>
-        <p>📧 <strong>Email:</strong> ${userData.email}</p>
-        <p>👤 <strong>Nome:</strong> ${userData.fullName}</p>
-        <p>📅 <strong>Trial válido até:</strong> ${trialEnd.toLocaleDateString(
-          "pt-BR"
-        )}</p>
-        <p>🚀 <strong>Você já pode fazer login!</strong></p>
-      </div>
+      if (!loginError) {
+        console.log("✅ Login automático realizado!");
+      }
+    } catch (loginAutoError) {
+      console.log("⚠️ Login automático falhou, mas conta foi criada");
+    }
 
-      <p><strong>Faça login agora e comece a usar o sistema.</strong></p>
-    `;
-
-    // Criar modal de sucesso
-    showSuccessModal(successMessage);
+    // 8. Mostrar sucesso
+    showSuccessModal(false); // Passa false para indicar que é novo cadastro
   } catch (error) {
     console.error("❌ Erro ao criar conta trial:", error);
-
-    let errorMessage = "Erro ao criar conta: ";
-
-    if (error.message.includes("já está cadastrado")) {
-      errorMessage = error.message;
-    } else if (error.message.includes("Email")) {
-      errorMessage += "Verifique o email informado.";
-    } else if (error.message.includes("Password")) {
-      errorMessage += "A senha não atende aos requisitos de segurança.";
-    } else if (error.message.includes("rate limit")) {
-      errorMessage = "Muitas tentativas. Aguarde alguns minutos.";
-    } else {
-      errorMessage += error.message;
-    }
-
-    alert(`❌ ${errorMessage}`);
+    alert(`❌ ${error.message}`);
   } finally {
     // Reativar botão
     if (btnCadastrar) btnCadastrar.disabled = false;
@@ -403,78 +390,66 @@ async function createTrialAccount() {
   }
 }
 
-async function processTokenFromURL() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
-  const type = urlParams.get("type");
+// Mostrar modal de sucesso (ATUALIZADO)
+function showSuccessModal(isExistingUser = false) {
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 30);
 
-  if (token && type === "signup") {
-    console.log("🔄 Processando token da URL...", token);
+  const message = isExistingUser
+    ? `
+      <div class="text-center">
+        <div class="mb-4">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        </div>
+        <h4 class="text-success mb-3">Bem-vindo de volta!</h4>
+        <p class="mb-3">Login realizado com sucesso.</p>
+        <p><strong>Seu trial continua ativo até:</strong><br>
+        ${trialEnd.toLocaleDateString("pt-BR")}</p>
+      </div>
+    `
+    : `
+      <div class="text-center">
+        <div class="mb-4">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        </div>
+        <h4 class="text-success mb-3">Conta Criada com Sucesso!</h4>
+        <div class="text-start mb-4">
+          <p><strong>✅ Seu Trial de 30 dias está ativo!</strong></p>
+          <p><strong>📧 Email:</strong> ${userData.email}</p>
+          <p><strong>👤 Nome:</strong> ${userData.fullName}</p>
+          <p><strong>📅 Trial válido até:</strong> ${trialEnd.toLocaleDateString(
+            "pt-BR"
+          )}</p>
+        </div>
+        <p class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>Pronto para começar!</strong> Faça login com suas credenciais.
+        </p>
+      </div>
+    `;
 
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        token: token,
-        type: "signup",
-      });
-
-      if (error) {
-        console.error("❌ Erro ao verificar token:", error);
-      } else {
-        console.log("✅ Token verificado com sucesso!");
-        // O usuário agora está confirmado
-        showSuccess();
-      }
-    } catch (error) {
-      console.error("❌ Erro no processamento do token:", error);
-    }
-  }
-}
-
-// E modifique a função processConfirmation:
-async function processConfirmation() {
-  try {
-    console.log("🔍 Iniciando processamento de confirmação...");
-
-    // Primeiro tenta processar token da URL
-    await processTokenFromURL();
-
-    // Depois verifica a sessão normalmente
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
-
-    if (session?.user) {
-      console.log("✅ Sessão ativa detectada:", session.user.email);
-      showSuccess();
-    } else {
-      console.log("ℹ️ Aguardando confirmação...");
-      // Mantém mostrando "Processando..." até a confirmação
-    }
-  } catch (error) {
-    console.error("❌ Erro no processamento:", error);
-    showError(error.message);
-  }
-}
-
-// Mostrar modal de sucesso
-function showSuccessModal(message) {
   // Criar modal dinamicamente
   const modalHtml = `
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-success text-white">
             <h5 class="modal-title" id="successModalLabel">
               <i class="bi bi-check-circle-fill me-2"></i>
-              Conta Criada com Sucesso!
+              ${isExistingUser ? "Login Realizado!" : "Conta Criada!"}
             </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             ${message}
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Fechar
+            </button>
+            <button type="button" class="btn btn-success" id="goToSystemBtn">
+              <i class="bi bi-box-arrow-in-right me-2"></i>
+              Ir para o Sistema
+            </button>
           </div>
         </div>
       </div>
@@ -490,22 +465,26 @@ function showSuccessModal(message) {
   );
   successModal.show();
 
-  // Redirecionar automaticamente após 10 segundos
+  // Configurar botão "Ir para o Sistema"
+  document.getElementById("goToSystemBtn").addEventListener("click", () => {
+    window.location.href = "https://sarmtech.netlify.app/login/login.html";
+  });
+
+  // Fechar modal após 10 segundos e redirecionar
   setTimeout(() => {
-    window.location.href = "https://sarmtech.netlify.app/";
+    successModal.hide();
+    window.location.href = "https://sarmtech.netlify.app/login/login.html";
   }, 10000);
 }
 
-// Função para migrar trial para plano pago (para usar depois)
+// Função para migrar trial para plano pago (mantida para uso futuro)
 async function migrateTrialToPaid(userId, targetPlanId, paymentMethod) {
   try {
     console.log(`🔄 Migrando usuário ${userId} para plano ${targetPlanId}`);
 
-    // Calcular período
     const periodEnd = new Date();
-    periodEnd.setMonth(periodEnd.getMonth() + 1); // Mensal por padrão
+    periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-    // Atualizar assinatura
     const { error: updateError } = await supabase
       .from("subscriptions")
       .update({
@@ -520,7 +499,6 @@ async function migrateTrialToPaid(userId, targetPlanId, paymentMethod) {
 
     if (updateError) throw updateError;
 
-    // Atualizar perfil do usuário
     const { error: profileError } = await supabase
       .from("user_profiles")
       .update({
@@ -545,11 +523,6 @@ window.supabase = supabase;
 window.userData = userData;
 window.migrateTrialToPaid = migrateTrialToPaid;
 
-console.log("✅ cadastro-pagamento.js carregado com sucesso!");
-
-console.log("🔗 Link de confirmação que seria enviado:");
 console.log(
-  `https://sarm-tech.netlify.app/confirm.html?redirect_to=${encodeURIComponent(
-    "https://sarmtech.netlify.app/login/login.html"
-  )}`
+  "✅ cadastro-pagamento.js carregado com sucesso! (SEM CONFIRMAÇÃO)"
 );
