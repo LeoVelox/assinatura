@@ -115,118 +115,86 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.min.js"></script>
 
     <script>
-      const client = supabase.createClient(
-        "https://pjvgzbnqnwrqxwlbndkr.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE"
-      );
-
       async function processConfirmation() {
         try {
-          console.log("🔥 Iniciando confirmação...");
+          console.log("🚀 Processando confirmação...");
 
-          const params = new URLSearchParams(window.location.search);
-          const token = params.get("token");
-          const type = params.get("type") || "signup";
+          // Captura parâmetros
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get("token");
+          const type = urlParams.get("type") || "signup";
 
-          console.log("📌 Parâmetros:", { token, type });
+          console.log("🔍 Token:", token, "Type:", type);
 
           if (!token) {
-            throw new Error("Token não encontrado na URL.");
+            throw new Error("Token não encontrado");
           }
 
-          // Método CORRETO para verificação de OTP
-          // Para email confirmation, use type: "signup" ou "email"
+          // 1. Tenta com verifyOtp
+          console.log("🔄 Tentando verifyOtp...");
           const { data, error } = await client.auth.verifyOtp({
-            token_hash: token, // Aqui é token_hash mesmo para OTP numérico
-            type: type, // "signup" para confirmação de cadastro
+            token_hash: token,
+            type: type,
           });
 
           if (error) {
-            console.error("❌ Erro do Supabase:", error);
+            console.log("⚠️ verifyOtp falhou, tentando método alternativo...");
 
-            // Tenta com type email se signup falhar
-            if (error.message.includes("signup")) {
-              console.log("🔄 Tentando com type: 'email'...");
-              const { data: emailData, error: emailError } =
-                await client.auth.verifyOtp({
+            // 2. Método alternativo - chama diretamente a API do Supabase
+            const response = await fetch(
+              "https://pjvgzbnqnwrqxwlbndkr.supabase.co/auth/v1/verify",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey:
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE",
+                },
+                body: JSON.stringify({
                   token_hash: token,
-                  type: "email", // Alternativa
-                });
+                  type: type,
+                }),
+              }
+            );
 
-              if (emailError) throw emailError;
+            const result = await response.json();
 
-              console.log("✅ Confirmado via type 'email':", emailData);
-              showSuccess();
-              return;
+            if (!response.ok) {
+              throw new Error(result.error?.message || "Erro na verificação");
             }
 
-            throw error;
+            console.log("✅ Confirmado via API direta:", result);
+          } else {
+            console.log("✅ Confirmado via verifyOtp:", data);
           }
 
-          console.log("✅ Confirmado com sucesso:", data);
+          // Sucesso!
           showSuccess();
-        } catch (err) {
-          console.error("❌ Erro completo:", err);
+        } catch (error) {
+          console.error("❌ Erro detalhado:", error);
+          showError(
+            error.message || "Erro ao confirmar o email. Tente novamente."
+          );
+        }
+      }
 
-          let userMessage = "Não foi possível confirmar seu email.";
+      function showSuccess(message = "Seu email foi confirmado com sucesso!") {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("success").style.display = "block";
 
-          if (err.message.includes("already confirmed")) {
-            userMessage =
-              "Seu email já foi confirmado. Você pode fazer login agora.";
-            showSuccess(userMessage);
-          } else if (err.message.includes("expired")) {
-            userMessage =
-              "Este link expirou. Por favor, solicite um novo email de confirmação.";
-          } else if (
-            err.message.includes("Invalid") ||
-            err.message.includes("invalid")
-          ) {
-            userMessage =
-              "Código de confirmação inválido. Tente novamente ou solicite um novo email.";
-          }
-
-          showError(userMessage);
+        if (message !== "Seu email foi confirmado com sucesso!") {
+          document.querySelector("#success p").textContent = message;
         }
       }
 
       function showError(message) {
         document.getElementById("loading").style.display = "none";
-        document.getElementById("success").style.display = "none";
         document.getElementById("error").style.display = "block";
         document.getElementById("errorMessage").textContent = message;
-
-        // Adiciona botão para reenviar confirmação
-        const resendButton = document.createElement("button");
-        resendButton.className = "btn";
-        resendButton.textContent = "Reenviar Email de Confirmação";
-        resendButton.onclick = resendConfirmation;
-
-        const errorDiv = document.getElementById("error");
-        errorDiv.appendChild(resendButton);
       }
 
-      async function resendConfirmation() {
-        try {
-          // Extrai email da URL ou pede ao usuário
-          const email = prompt(
-            "Por favor, informe seu email para reenviar a confirmação:"
-          );
-          if (!email) return;
-
-          const { error } = await client.auth.resend({
-            type: "signup",
-            email: email,
-          });
-
-          if (error) throw error;
-
-          alert(
-            "Email de confirmação reenviado com sucesso! Verifique sua caixa de entrada."
-          );
-        } catch (err) {
-          alert("Erro ao reenviar: " + err.message);
-        }
-      }
+      // Adicione esta linha para iniciar
+      document.addEventListener("DOMContentLoaded", processConfirmation);
     </script>
   </body>
 </html>
