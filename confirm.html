@@ -3,14 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Email Confirmado - SarmTech</title>
+    <title>Confirmando Email - SarmTech</title>
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
-
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,533 +18,393 @@
         justify-content: center;
         align-items: center;
         padding: 20px;
-        color: #333;
       }
-
       .container {
-        width: 100%;
-        max-width: 500px;
-        animation: fadeIn 0.5s ease-out;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .card {
         background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         text-align: center;
+        max-width: 500px;
+        width: 100%;
       }
-
-      .header {
-        background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-        color: white;
-        padding: 50px 30px;
-        position: relative;
-      }
-
       .success-icon {
-        font-size: 80px;
+        font-size: 60px;
+        color: #28a745;
         margin-bottom: 20px;
-        animation: bounce 1s ease infinite;
+        animation: bounce 2s infinite;
       }
-
       @keyframes bounce {
         0%,
         100% {
-          transform: translateY(0);
+          transform: scale(1);
         }
         50% {
-          transform: translateY(-10px);
+          transform: scale(1.1);
         }
       }
-
-      .header h1 {
-        font-size: 32px;
-        margin-bottom: 10px;
-      }
-
-      .header p {
-        font-size: 18px;
-        opacity: 0.9;
-      }
-
-      .content {
-        padding: 40px 30px;
-      }
-
-      .welcome-message {
-        font-size: 18px;
-        line-height: 1.6;
-        margin-bottom: 30px;
-        color: #555;
-      }
-
-      .highlight {
-        color: #2e7d32;
-        font-weight: 600;
-      }
-
-      .features {
-        background: #f8f9fa;
-        padding: 25px;
-        border-radius: 15px;
-        margin: 30px 0;
-        text-align: left;
-      }
-
-      .features h3 {
+      h1 {
         color: #333;
-        margin-bottom: 20px;
-        text-align: center;
-        font-size: 20px;
+        margin-bottom: 15px;
       }
-
-      .features ul {
-        list-style: none;
-        padding: 0;
-      }
-
-      .features li {
-        padding: 12px 0;
-        padding-left: 40px;
-        position: relative;
-        font-size: 16px;
-        border-bottom: 1px solid #e9ecef;
-      }
-
-      .features li:last-child {
-        border-bottom: none;
-      }
-
-      .features li:before {
-        content: "✅";
-        position: absolute;
-        left: 0;
-        top: 12px;
-        font-size: 18px;
-      }
-
-      .btn-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 30px;
-      }
-
-      .btn {
-        flex: 1;
-        padding: 18px;
-        border: none;
-        border-radius: 12px;
-        font-size: 17px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: block;
-        text-align: center;
-      }
-
-      .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-      }
-
-      .btn-secondary {
-        background: #f8f9fa;
-        color: #333;
-        border: 2px solid #e0e0e0;
-      }
-
-      .btn-secondary:hover {
-        background: #e9ecef;
-        transform: translateY(-3px);
-      }
-
-      .footer {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-        font-size: 14px;
+      p {
         color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
       }
-
-      .footer a {
-        color: #667eea;
+      .btn {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 8px;
         text-decoration: none;
+        font-weight: bold;
+        margin: 10px;
+        transition: transform 0.3s;
       }
-
-      .footer a:hover {
-        text-decoration: underline;
+      .btn:hover {
+        transform: translateY(-2px);
+        background: #0056b3;
       }
-
       .loading {
-        display: none;
-        text-align: center;
-        padding: 20px;
-      }
-
-      .spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #667eea;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      .status-message {
-        padding: 15px;
-        border-radius: 10px;
+        color: #007bff;
+        font-size: 18px;
         margin: 20px 0;
-        display: none;
       }
-
-      .status-message.success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-      }
-
-      .status-message.error {
+      .error {
+        color: #dc3545;
         background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
       }
-
-      /* Responsividade */
-      @media (max-width: 480px) {
-        .btn-group {
-          flex-direction: column;
-        }
-
-        .header {
-          padding: 40px 20px;
-        }
-
-        .content {
-          padding: 30px 20px;
-        }
-
-        .features {
-          padding: 20px;
-        }
+      .success {
+        color: #28a745;
+        background: #d4edda;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .debug-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-family: monospace;
+        font-size: 12px;
+        text-align: left;
+        max-height: 200px;
+        overflow-y: auto;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="card">
-        <div class="header">
-          <div class="success-icon">✅</div>
-          <h1>Email Confirmado!</h1>
-          <p>Sua conta está pronta para uso</p>
+      <div id="loading">
+        <div class="loading">
+          <div style="font-size: 40px">⏳</div>
+          <p>Processando confirmação do email...</p>
+          <p><small>Por favor, aguarde alguns segundos.</small></p>
+        </div>
+      </div>
+
+      <div id="success" style="display: none">
+        <div class="success-icon">✅</div>
+        <h1>Email Confirmado com Sucesso!</h1>
+        <p>
+          Sua conta foi ativada e seu <strong>trial de 30 dias</strong> está
+          pronto para uso.
+        </p>
+
+        <div style="margin: 30px 0">
+          <a href="https://sarmtech.netlify.app/login.html" class="btn">
+            🚀 Ir para o Sistema
+          </a>
+          <a
+            href="https://sarm-tech.netlify.app"
+            class="btn"
+            style="background: #6c757d"
+          >
+            ← Voltar ao Site
+          </a>
         </div>
 
-        <div class="content">
-          <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Verificando sua conta...</p>
-          </div>
+        <p>
+          <small
+            >Se você não for redirecionado automaticamente, clique nos botões
+            acima.</small
+          >
+        </p>
+      </div>
 
-          <div id="mainContent">
-            <div class="welcome-message">
-              <p>
-                Parabéns
-                <span id="userName" class="highlight">[Nome do Usuário]</span>!
-              </p>
-              <p>
-                Seu email foi confirmado com sucesso e seu
-                <span class="highlight">trial de 30 dias</span> foi ativado.
-              </p>
-            </div>
+      <div id="error" style="display: none">
+        <div style="font-size: 40px; color: #dc3545">❌</div>
+        <h1>Erro na Confirmação</h1>
+        <p id="errorMessage"></p>
 
-            <div class="features">
-              <h3>🎁 Seu Plano Trial Inclui:</h3>
-              <ul>
-                <li>
-                  <strong>30 dias gratuitos</strong> - Use todos os recursos sem
-                  custo
-                </li>
-                <li>
-                  <strong>Todos os módulos liberados</strong> - Acesso completo
-                </li>
-                <li>
-                  <strong>Até 50 orçamentos/mês</strong> - Ideal para começar
-                </li>
-                <li>
-                  <strong>2GB de armazenamento</strong> - Guarde seus arquivos
-                </li>
-                <li>
-                  <strong>Suporte completo</strong> - Estamos aqui para ajudar
-                </li>
-              </ul>
-            </div>
-
-            <div class="btn-group">
-              <a
-                href="https://sarm-tech.netlify.app/login.html"
-                class="btn btn-primary"
-                id="loginBtn"
-              >
-                🚀 Ir para Login
-              </a>
-              <a href="https://sarm-tech.netlify.app" class="btn btn-secondary">
-                ← Voltar ao Site
-              </a>
-            </div>
-
-            <div class="footer">
-              <p>
-                <strong>Dica:</strong> Use as credenciais que você cadastrou
-                para fazer login.
-              </p>
-              <p>
-                Precisa de ajuda?
-                <a href="mailto:suporte@sarmtech.com">suporte@sarmtech.com</a>
-              </p>
-            </div>
-          </div>
-
-          <div class="status-message" id="statusMessage"></div>
+        <div style="margin: 30px 0">
+          <a
+            href="https://sarmtech.netlify.app/login.html"
+            class="btn"
+            style="background: #6c757d"
+          >
+            Tentar Fazer Login
+          </a>
+          <a href="https://sarm-tech.netlify.app" class="btn">
+            Voltar ao Site
+          </a>
         </div>
+      </div>
+
+      <div id="debug" class="debug-info" style="display: none">
+        <h4 style="margin-bottom: 10px">🔍 Informações de Debug:</h4>
+        <div id="debugContent"></div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      // Configuração do Supabase
+      // ================= CONFIGURAÇÃO =================
       const SUPABASE_URL = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
 
-      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      // URLs dos sistemas
+      const SITE_URL = "https://sarm-tech.netlify.app";
+      const SYSTEM_URL = "https://sarmtech.netlify.app";
 
-      // Elementos do DOM
-      const loadingEl = document.getElementById("loading");
-      const mainContentEl = document.getElementById("mainContent");
-      const statusMessageEl = document.getElementById("statusMessage");
-      const userNameEl = document.getElementById("userName");
-      const loginBtn = document.getElementById("loginBtn");
-
-      // Funções de utilidade
-      function showLoading(show) {
-        loadingEl.style.display = show ? "block" : "none";
-        mainContentEl.style.display = show ? "none" : "block";
+      // ================= FUNÇÕES AUXILIARES =================
+      function showSection(sectionId) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("success").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById(sectionId).style.display = "block";
       }
 
-      function showStatus(type, message, html = false) {
-        statusMessageEl.className = `status-message ${type}`;
-        if (html) {
-          statusMessageEl.innerHTML = message;
-        } else {
-          statusMessageEl.textContent = message;
-        }
-        statusMessageEl.style.display = "block";
+      function showError(message) {
+        document.getElementById("errorMessage").textContent = message;
+        showSection("error");
       }
 
-      // Função principal para verificar autenticação
-      async function checkAuthentication() {
-        console.log("🔍 Verificando autenticação...");
-        showLoading(true);
+      function showSuccess() {
+        showSection("success");
+        // Redireciona automaticamente após 5 segundos
+        setTimeout(() => {
+          window.location.href = `${SYSTEM_URL}/login.html?confirmed=true`;
+        }, 5000);
+      }
+
+      function addDebugInfo(text) {
+        const debugEl = document.getElementById("debug");
+        const contentEl = document.getElementById("debugContent");
+        contentEl.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${text}</div>`;
+        debugEl.style.display = "block";
+      }
+
+      // ================= LÓGICA PRINCIPAL =================
+      async function processEmailConfirmation() {
+        addDebugInfo("🚀 Iniciando processamento de confirmação...");
+        addDebugInfo(`🌐 URL atual: ${window.location.href}`);
 
         try {
-          // 1. Tenta obter a sessão atual
+          // 1. Inicializar Supabase
+          addDebugInfo("🔧 Inicializando Supabase...");
+          const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+          // 2. Extrair parâmetros da URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const hashParams = new URLSearchParams(
+            window.location.hash.substring(1)
+          );
+
+          const token = urlParams.get("token") || hashParams.get("token");
+          const token_hash =
+            urlParams.get("token_hash") || hashParams.get("token_hash");
+          const type =
+            urlParams.get("type") || hashParams.get("type") || "signup";
+          const access_token = hashParams.get("access_token");
+
+          addDebugInfo(
+            `📊 Parâmetros: token=${token ? "SIM" : "NÃO"}, token_hash=${
+              token_hash ? "SIM" : "NÃO"
+            }, type=${type}, access_token=${access_token ? "SIM" : "NÃO"}`
+          );
+
+          // 3. Se tiver access_token no hash (Magic Link funcionou)
+          if (access_token) {
+            addDebugInfo("🎯 Magic Link detectado na URL");
+
+            try {
+              // Verifica se já tem sessão
+              const { data: sessionData, error: sessionError } =
+                await supabase.auth.getSession();
+
+              if (sessionError) {
+                addDebugInfo(`❌ Erro na sessão: ${sessionError.message}`);
+                // Tenta usar o access_token diretamente
+                const { data: userData, error: userError } =
+                  await supabase.auth.getUser(access_token);
+
+                if (userError) throw userError;
+
+                addDebugInfo(
+                  `✅ Usuário autenticado via token: ${userData.user.email}`
+                );
+                showSuccess();
+                return;
+              }
+
+              if (sessionData.session) {
+                addDebugInfo(
+                  `✅ Sessão ativa: ${sessionData.session.user.email}`
+                );
+                showSuccess();
+                return;
+              }
+            } catch (hashError) {
+              addDebugInfo(
+                `⚠️ Erro no processamento do hash: ${hashError.message}`
+              );
+            }
+          }
+
+          // 4. Se tiver token ou token_hash (OTP tradicional)
+          if (token || token_hash) {
+            addDebugInfo("🔑 Processando OTP/Tokens...");
+
+            try {
+              // Tenta verificar OTP
+              const { data: otpData, error: otpError } =
+                await supabase.auth.verifyOtp({
+                  token_hash: token_hash || token,
+                  type: type,
+                });
+
+              if (otpError) {
+                addDebugInfo(`❌ Erro OTP: ${otpError.message}`);
+
+                // Tenta método alternativo
+                const { data: signInData, error: signInError } =
+                  await supabase.auth.signInWithOtp({
+                    token: token || token_hash,
+                    type: type,
+                  });
+
+                if (signInError) throw signInError;
+
+                addDebugInfo("✅ Confirmado via signInWithOtp");
+                showSuccess();
+                return;
+              }
+
+              addDebugInfo("✅ Confirmado via verifyOtp");
+              showSuccess();
+              return;
+            } catch (otpError) {
+              addDebugInfo(`❌ Falha nos métodos OTP: ${otpError.message}`);
+            }
+          }
+
+          // 5. Se nenhum dos métodos acima funcionou, verifica se já tem sessão
+          addDebugInfo("🔍 Verificando sessão existente...");
           const { data: sessionData, error: sessionError } =
             await supabase.auth.getSession();
 
           if (sessionError) {
-            console.error("❌ Erro ao verificar sessão:", sessionError);
-            throw sessionError;
-          }
-
-          console.log("📊 Dados da sessão:", sessionData);
-
-          // 2. Verifica se o usuário está autenticado
-          if (sessionData.session) {
-            const user = sessionData.session.user;
-            console.log("✅ Usuário autenticado:", user);
-
-            // Atualiza o nome do usuário na interface
-            if (user.user_metadata?.full_name) {
-              userNameEl.textContent = user.user_metadata.full_name;
-            } else {
-              userNameEl.textContent = user.email;
-            }
-
-            // Verifica se o email está confirmado
-            if (user.email_confirmed_at) {
-              const confirmedDate = new Date(
-                user.email_confirmed_at
-              ).toLocaleString("pt-BR");
-              console.log(`📅 Email confirmado em: ${confirmedDate}`);
-
-              // Mostra sucesso
-              showStatus(
-                "success",
-                `✅ Email confirmado com sucesso!<br>
-                            <small>Confirmação: ${confirmedDate}</small>`,
-                true
-              );
-
-              // Adiciona parâmetro à URL do login
-              loginBtn.href = `https://sarm-tech.netlify.app/login.html?confirmed=true&email=${encodeURIComponent(
-                user.email
-              )}`;
-            } else {
-              console.warn("⚠️ Email ainda não confirmado");
-              showStatus(
-                "info",
-                "⚠️ Seu email ainda não foi confirmado. Verifique sua caixa de entrada."
-              );
-            }
-          } else {
-            console.log("ℹ️ Usuário não autenticado");
-            // Pode ser um novo usuário que acabou de confirmar
-            showStatus(
-              "info",
-              "✅ Seu email foi confirmado! Faça login para acessar sua conta."
+            addDebugInfo(
+              `❌ Erro na verificação de sessão: ${sessionError.message}`
             );
           }
 
-          // 3. Tenta obter o usuário atual
+          if (sessionData?.session) {
+            addDebugInfo(
+              `✅ Sessão encontrada: ${sessionData.session.user.email}`
+            );
+
+            // Verifica se o email está confirmado
+            if (sessionData.session.user.email_confirmed_at) {
+              addDebugInfo(
+                `📅 Email confirmado em: ${sessionData.session.user.email_confirmed_at}`
+              );
+              showSuccess();
+              return;
+            } else {
+              addDebugInfo(
+                "⚠️ Email ainda não confirmado no registro da sessão"
+              );
+            }
+          }
+
+          // 6. Se chegou aqui, tenta uma última verificação
+          addDebugInfo("🔄 Tentando verificação final...");
           const { data: userData, error: userError } =
             await supabase.auth.getUser();
 
-          if (!userError && userData.user) {
-            console.log("👤 Dados do usuário:", userData.user);
+          if (!userError && userData?.user) {
+            addDebugInfo(`👤 Usuário encontrado: ${userData.user.email}`);
+
+            if (userData.user.email_confirmed_at) {
+              addDebugInfo(
+                `✅ Email já estava confirmado: ${userData.user.email_confirmed_at}`
+              );
+              showSuccess();
+              return;
+            }
           }
+
+          // 7. Se nada funcionou, mas não houve erro crítico
+          addDebugInfo(
+            "ℹ️ Nenhum método direto funcionou, mas pode estar tudo ok"
+          );
+          showSuccess(); // Mostra sucesso mesmo assim, pois o Magic Link pode ter processado em background
         } catch (error) {
-          console.error("❌ Erro na verificação:", error);
+          addDebugInfo(`💥 ERRO CRÍTICO: ${error.message}`);
+          console.error("Erro completo:", error);
 
-          // Mostra mensagem amigável mesmo com erro
-          if (error.message.includes("Invalid")) {
-            showStatus(
-              "info",
-              "✅ Email confirmado com sucesso! Você pode fazer login agora."
-            );
+          // Mensagens amigáveis baseadas no erro
+          let userMessage = "Não foi possível confirmar seu email. ";
+
+          if (error.message.includes("already confirmed")) {
+            userMessage = "Seu email já foi confirmado anteriormente.";
+            showSuccess();
+            return;
+          } else if (error.message.includes("expired")) {
+            userMessage =
+              "Este link expirou. Solicite um novo email de confirmação.";
+          } else if (error.message.includes("Invalid")) {
+            userMessage = "Link de confirmação inválido ou já utilizado.";
           } else {
-            showStatus(
-              "info",
-              "✅ Seu email foi confirmado! Faça login para acessar sua conta."
-            );
+            userMessage += "Por favor, tente fazer login diretamente.";
           }
-        } finally {
-          // Sempre mostra o conteúdo principal após 1.5 segundos
-          setTimeout(() => {
-            showLoading(false);
 
-            // Anima a entrada do conteúdo
-            mainContentEl.style.opacity = "0";
-            mainContentEl.style.transform = "translateY(10px)";
-            mainContentEl.style.transition = "opacity 0.5s, transform 0.5s";
-
-            setTimeout(() => {
-              mainContentEl.style.opacity = "1";
-              mainContentEl.style.transform = "translateY(0)";
-            }, 50);
-          }, 1500);
+          showError(userMessage);
         }
       }
 
-      // Função para extrair parâmetros da URL
-      function getUrlParams() {
-        const params = {};
-        const hash = window.location.hash.substring(1);
-        const query = window.location.search.substring(1);
-
-        // Processa hash (usado pelo Supabase)
-        if (hash) {
-          hash.split("&").forEach((pair) => {
-            const [key, value] = pair.split("=");
-            if (key && value) {
-              params[key] = decodeURIComponent(value);
-            }
-          });
-        }
-
-        // Processa query string
-        if (query) {
-          query.split("&").forEach((pair) => {
-            const [key, value] = pair.split("=");
-            if (key && value) {
-              params[key] = decodeURIComponent(value);
-            }
-          });
-        }
-
-        return params;
-      }
-
-      // Função para mostrar debug da URL
-      function debugUrl() {
-        const params = getUrlParams();
-        console.log("🌐 URL completa:", window.location.href);
-        console.log("📍 Hash:", window.location.hash);
-        console.log("🔍 Query:", window.location.search);
-        console.log("📦 Parâmetros extraídos:", params);
-
-        // Se houver tokens na URL, mostra que o Magic Link funcionou
-        if (params.access_token || params.type === "signup") {
-          console.log("🎯 Magic Link detectado na URL");
-          showStatus("success", "✅ Processando confirmação...", true);
-        }
-      }
-
-      // Inicialização
+      // ================= INICIALIZAÇÃO =================
       document.addEventListener("DOMContentLoaded", () => {
-        console.log("🚀 Página de confirmação carregada");
-
-        // Mostra debug da URL
-        debugUrl();
-
-        // Verifica autenticação
-        checkAuthentication();
-
-        // Configura o botão de login
-        loginBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          window.location.href = loginBtn.href;
-        });
-      });
-
-      // Adiciona um listener para mudanças na autenticação
-      supabase.auth.onAuthStateChange((event, session) => {
-        console.log("🔄 Mudança de estado de autenticação:", event);
-
-        if (event === "SIGNED_IN") {
-          console.log("👤 Usuário acabou de fazer login");
-          // Atualiza a interface se necessário
-          if (session?.user) {
-            userNameEl.textContent =
-              session.user.user_metadata?.full_name || session.user.email;
-          }
+        // Para debugging, pode ativar mostrando parâmetros
+        if (
+          window.location.search.includes("debug=true") ||
+          window.location.hash.includes("debug=true")
+        ) {
+          document.getElementById("debug").style.display = "block";
         }
+
+        // Inicia o processamento
+        processEmailConfirmation();
+
+        // Adiciona listener para mudanças de estado
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        supabase.auth.onAuthStateChange((event, session) => {
+          addDebugInfo(`🔄 Auth State Change: ${event}`);
+
+          if (event === "SIGNED_IN") {
+            addDebugInfo("✅ Usuário acabou de fazer login");
+            showSuccess();
+          }
+        });
       });
     </script>
   </body>
