@@ -118,7 +118,11 @@
         </p>
 
         <div style="margin: 30px 0">
-          <a href="https://sarmtech.netlify.app/login.html" class="btn">
+          <!-- CORRIGIDO: login está dentro da pasta login -->
+          <a
+            href="https://sarmtech.netlify.app/login/login.html?confirmed=true"
+            class="btn"
+          >
             🚀 Ir para o Sistema
           </a>
           <a
@@ -144,6 +148,7 @@
         <p id="errorMessage"></p>
 
         <div style="margin: 30px 0">
+          <!-- CORRIGIDO AQUI TAMBÉM -->
           <a
             href="https://sarmtech.netlify.app/login/login.html"
             class="btn"
@@ -170,9 +175,10 @@
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
 
-      // URLs dos sistemas
+      // URLs dos sistemas (CORRIGIDO para o login)
       const SITE_URL = "https://sarm-tech.netlify.app";
       const SYSTEM_URL = "https://sarmtech.netlify.app";
+      const LOGIN_URL = `${SYSTEM_URL}/login/login.html`;
 
       // ================= VARIÁVEL GLOBAL =================
       let supabaseClient = null;
@@ -192,9 +198,9 @@
 
       function showSuccess() {
         showSection("success");
-        // Redireciona automaticamente após 5 segundos
+        // Redireciona automaticamente após 5 segundos (CORRIGIDO)
         setTimeout(() => {
-          window.location.href = `${SYSTEM_URL}/login.html?confirmed=true`;
+          window.location.href = `${LOGIN_URL}?confirmed=true`;
         }, 5000);
       }
 
@@ -213,6 +219,52 @@
         return supabaseClient;
       }
 
+      // Função para tentar confirmar manualmente via API
+      async function tryManualConfirmation() {
+        addDebugInfo("🔄 Tentando confirmação manual via API...");
+
+        try {
+          const supabase = initializeSupabase();
+
+          // 1. Tenta fazer login com algum método
+          // Primeiro, tenta verificar se há sessão ativa
+          const { data: sessionData, error: sessionError } =
+            await supabase.auth.getSession();
+
+          if (!sessionError && sessionData?.session) {
+            addDebugInfo(
+              `✅ Sessão encontrada: ${sessionData.session.user.email}`
+            );
+
+            // Verifica se o email já está confirmado
+            if (sessionData.session.user.email_confirmed_at) {
+              addDebugInfo("📅 Email já confirmado anteriormente");
+              return { success: true, user: sessionData.session.user };
+            }
+          }
+
+          // 2. Se não tem sessão, tenta verificar o usuário
+          const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+          if (!userError && userData?.user) {
+            addDebugInfo(`👤 Usuário obtido: ${userData.user.email}`);
+
+            if (userData.user.email_confirmed_at) {
+              addDebugInfo("✅ Email já estava confirmado");
+              return { success: true, user: userData.user };
+            }
+          }
+
+          // 3. Se chegou aqui, o email provavelmente NÃO está confirmado
+          addDebugInfo("⚠️ Não foi possível confirmar o email automaticamente");
+          return { success: false, message: "Email não confirmado" };
+        } catch (error) {
+          addDebugInfo(`❌ Erro na confirmação manual: ${error.message}`);
+          return { success: false, message: error.message };
+        }
+      }
+
       // ================= LÓGICA PRINCIPAL =================
       async function processEmailConfirmation() {
         addDebugInfo("🚀 Iniciando processamento de confirmação...");
@@ -229,6 +281,47 @@
             window.location.hash.substring(1)
           );
 
+          // 3. ANALISAR ERRO NA URL (você está recebendo um erro!)
+          const error = urlParams.get("error") || hashParams.get("error");
+          const error_description =
+            urlParams.get("error_description") ||
+            hashParams.get("error_description");
+
+          if (error) {
+            addDebugInfo(
+              `❌ ERRO DO SUPABASE: ${error} - ${error_description}`
+            );
+
+            // Se o erro for "already confirmed" ou similar, considera sucesso
+            if (
+              error_description &&
+              (error_description.toLowerCase().includes("already confirmed") ||
+                error_description.toLowerCase().includes("already verified") ||
+                error_description
+                  .toLowerCase()
+                  .includes("user already confirmed"))
+            ) {
+              addDebugInfo(
+                "✅ Email já estava confirmado (detectado pelo erro)"
+              );
+              showSuccess();
+              return;
+            }
+
+            // Para outros erros, tenta confirmação manual
+            addDebugInfo("⚠️ Erro na URL, tentando confirmação manual...");
+            const manualResult = await tryManualConfirmation();
+
+            if (manualResult.success) {
+              addDebugInfo(
+                `🎉 Confirmação manual bem-sucedida! Usuário: ${manualResult.user.email}`
+              );
+              showSuccess();
+              return;
+            }
+          }
+
+          // 4. Verificar parâmetros normais
           const token = urlParams.get("token") || hashParams.get("token");
           const token_hash =
             urlParams.get("token_hash") || hashParams.get("token_hash");
@@ -242,32 +335,7 @@
             }, type=${type}, access_token=${access_token ? "SIM" : "NÃO"}`
           );
 
-          // 3. ANALISAR ERRO NA URL (você está recebendo um erro!)
-          const error = urlParams.get("error") || hashParams.get("error");
-          const error_description =
-            urlParams.get("error_description") ||
-            hashParams.get("error_description");
-
-          if (error) {
-            addDebugInfo(
-              `❌ ERRO DO SUPABASE: ${error} - ${error_description}`
-            );
-
-            // Verificar se é erro de "already confirmed"
-            if (
-              error_description &&
-              error_description.includes("already confirmed")
-            ) {
-              addDebugInfo("✅ Email já estava confirmado");
-              showSuccess();
-              return;
-            }
-
-            // Para outros erros, tenta continuar
-            addDebugInfo("⚠️ Erro na URL, mas tentando continuar...");
-          }
-
-          // 4. Se tiver access_token no hash (Magic Link funcionou)
+          // 5. Se tiver access_token no hash (Magic Link funcionou)
           if (access_token) {
             addDebugInfo("🎯 Magic Link detectado na URL");
 
@@ -305,7 +373,7 @@
             }
           }
 
-          // 5. Se tiver token ou token_hash (OTP tradicional)
+          // 6. Se tiver token ou token_hash (OTP tradicional)
           if (token || token_hash) {
             addDebugInfo("🔑 Processando OTP/Tokens...");
 
@@ -342,56 +410,29 @@
             }
           }
 
-          // 6. Se nenhum dos métodos acima funcionou, verifica se já tem sessão
-          addDebugInfo("🔍 Verificando sessão existente...");
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.getSession();
+          // 7. Se chegou aqui sem parâmetros específicos, tenta confirmação manual
+          addDebugInfo(
+            "🔍 Nenhum parâmetro específico, tentando confirmação manual..."
+          );
+          const manualCheck = await tryManualConfirmation();
 
-          if (sessionError) {
-            addDebugInfo(
-              `❌ Erro na verificação de sessão: ${sessionError.message}`
-            );
+          if (manualCheck.success) {
+            addDebugInfo("✅ Confirmação manual bem-sucedida!");
+            showSuccess();
+            return;
           }
 
-          if (sessionData?.session) {
-            addDebugInfo(
-              `✅ Sessão encontrada: ${sessionData.session.user.email}`
-            );
+          // 8. Se nada funcionou, mas não temos erro crítico
+          addDebugInfo("ℹ️ Processamento concluído. Mostrando opções...");
 
-            // Verifica se o email está confirmado
-            if (sessionData.session.user.email_confirmed_at) {
-              addDebugInfo(
-                `📅 Email confirmado em: ${sessionData.session.user.email_confirmed_at}`
-              );
-              showSuccess();
-              return;
-            } else {
-              addDebugInfo(
-                "⚠️ Email ainda não confirmado no registro da sessão"
-              );
-            }
-          }
-
-          // 7. Se chegou aqui, tenta uma última verificação
-          addDebugInfo("🔄 Tentando verificação final...");
-          const { data: userData, error: userError } =
-            await supabase.auth.getUser();
-
-          if (!userError && userData?.user) {
-            addDebugInfo(`👤 Usuário encontrado: ${userData.user.email}`);
-
-            if (userData.user.email_confirmed_at) {
-              addDebugInfo(
-                `✅ Email já estava confirmado: ${userData.user.email_confirmed_at}`
-              );
-              showSuccess();
-              return;
-            }
-          }
-
-          // 8. Se chegou até aqui e não houve erro crítico, mostra sucesso
-          addDebugInfo("ℹ️ Processamento concluído sem erros críticos");
-          showSuccess();
+          // Mostra mensagem informativa
+          showError(
+            "O link de confirmação pode ter expirado ou já sido usado.<br><br>" +
+              "<strong>Sugestões:</strong><br>" +
+              "1. Tente fazer login diretamente<br>" +
+              "2. Solicite um novo email de confirmação<br>" +
+              "3. Entre em contato com o suporte"
+          );
         } catch (error) {
           addDebugInfo(`💥 ERRO CRÍTICO: ${error.message}`);
           console.error("Erro completo:", error);
