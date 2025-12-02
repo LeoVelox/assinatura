@@ -22,7 +22,7 @@
       sizes="16x16"
       href="./favicon/favicon-16x16.png"
     />
-    <link rel="manifest" href="/site.webmanifest" />
+    <!-- <link rel="manifest" href="/site.webmanifest" /> -->
 
     <style>
       body {
@@ -122,78 +122,67 @@
 
       async function processConfirmation() {
         try {
-          console.log("🔥 Supabase carregado:", client);
-          console.log("🔍 URL completa:", window.location.href);
-          console.log(
-            "🔍 Todos os parâmetros:",
-            Object.fromEntries(new URLSearchParams(window.location.search))
-          );
+          console.log("🔥 Iniciando confirmação...");
 
           const params = new URLSearchParams(window.location.search);
-          const token_hash = params.get("token_hash");
-          const token = params.get("token"); // Adicione esta linha
-          const type = params.get("type") || "email";
+          const token = params.get("token");
+          const type = params.get("type") || "signup";
 
-          console.log("📌 Parâmetros capturados:", { token_hash, token, type });
+          console.log("📌 Parâmetros:", { token, type });
 
-          // Se não tiver token_hash, tenta usar token
-          const verificationToken = token_hash || token;
-          if (!verificationToken) {
-            throw new Error("Token de verificação não encontrado.");
+          if (!token) {
+            throw new Error("Token não encontrado na URL.");
           }
 
-          // Tente diferentes abordagens
-          let verificationResult;
-
-          // Tenta primeiro com verifyOtp (para email verification)
-          try {
-            verificationResult = await client.auth.verifyOtp({
-              token_hash: verificationToken,
-              type: type,
-            });
-          } catch (otpError) {
-            console.log("⚠️ verifyOtp falhou, tentando signIn...");
-
-            // Se verifyOtp falhar, tenta signIn com token (para email confirmation)
-            verificationResult = await client.auth.signInWithOtp({
-              token: verificationToken,
-              type: type,
-            });
-          }
-
-          const { data, error } = verificationResult;
+          // Método CORRETO para verificação de OTP
+          // Para email confirmation, use type: "signup" ou "email"
+          const { data, error } = await client.auth.verifyOtp({
+            token_hash: token, // Aqui é token_hash mesmo para OTP numérico
+            type: type, // "signup" para confirmação de cadastro
+          });
 
           if (error) {
-            console.error("❌ Erro detalhado:", error);
+            console.error("❌ Erro do Supabase:", error);
 
-            // Verifica se é um erro comum
-            if (error.message.includes("already confirmed")) {
-              showSuccess("Seu email já foi confirmado anteriormente!");
+            // Tenta com type email se signup falhar
+            if (error.message.includes("signup")) {
+              console.log("🔄 Tentando com type: 'email'...");
+              const { data: emailData, error: emailError } =
+                await client.auth.verifyOtp({
+                  token_hash: token,
+                  type: "email", // Alternativa
+                });
+
+              if (emailError) throw emailError;
+
+              console.log("✅ Confirmado via type 'email':", emailData);
+              showSuccess();
               return;
             }
 
-            throw new Error(error.message);
+            throw error;
           }
 
           console.log("✅ Confirmado com sucesso:", data);
           showSuccess();
         } catch (err) {
-          console.error("❌ Erro no processamento:", err);
+          console.error("❌ Erro completo:", err);
 
-          // Mensagens mais amigáveis
-          let userMessage = "Falha na confirmação do email.";
+          let userMessage = "Não foi possível confirmar seu email.";
 
-          if (err.message.includes("expired")) {
+          if (err.message.includes("already confirmed")) {
             userMessage =
-              "Link expirado. Por favor, solicite um novo link de confirmação.";
-          } else if (err.message.includes("invalid")) {
+              "Seu email já foi confirmado. Você pode fazer login agora.";
+            showSuccess(userMessage);
+          } else if (err.message.includes("expired")) {
             userMessage =
-              "Link inválido. Por favor, verifique o link ou solicite um novo.";
-          } else if (err.message.includes("500")) {
+              "Este link expirou. Por favor, solicite um novo email de confirmação.";
+          } else if (
+            err.message.includes("Invalid") ||
+            err.message.includes("invalid")
+          ) {
             userMessage =
-              "Erro interno do servidor. Por favor, tente novamente em alguns minutos.";
-          } else {
-            userMessage = err.message;
+              "Código de confirmação inválido. Tente novamente ou solicite um novo email.";
           }
 
           showError(userMessage);
