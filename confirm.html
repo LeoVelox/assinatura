@@ -32,16 +32,6 @@
         font-size: 60px;
         color: #28a745;
         margin-bottom: 20px;
-        animation: bounce 2s infinite;
-      }
-      @keyframes bounce {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
       }
       h1 {
         color: #333;
@@ -86,17 +76,6 @@
         border-radius: 8px;
         margin: 20px 0;
       }
-      .debug-info {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 20px;
-        font-family: monospace;
-        font-size: 12px;
-        text-align: left;
-        max-height: 200px;
-        overflow-y: auto;
-      }
     </style>
   </head>
   <body>
@@ -118,7 +97,6 @@
         </p>
 
         <div style="margin: 30px 0">
-          <!-- CORRIGIDO: login está dentro da pasta login -->
           <a
             href="https://sarmtech.netlify.app/login/login.html?confirmed=true"
             class="btn"
@@ -134,12 +112,7 @@
           </a>
         </div>
 
-        <p>
-          <small
-            >Se você não for redirecionado automaticamente, clique nos botões
-            acima.</small
-          >
-        </p>
+        <p><small>Redirecionando automaticamente em 5 segundos...</small></p>
       </div>
 
       <div id="error" style="display: none">
@@ -148,7 +121,6 @@
         <p id="errorMessage"></p>
 
         <div style="margin: 30px 0">
-          <!-- CORRIGIDO AQUI TAMBÉM -->
           <a
             href="https://sarmtech.netlify.app/login/login.html"
             class="btn"
@@ -161,284 +133,137 @@
           </a>
         </div>
       </div>
-
-      <div id="debug" class="debug-info" style="display: none">
-        <h4 style="margin-bottom: 10px">🔍 Informações de Debug:</h4>
-        <div id="debugContent"></div>
-      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-      // ================= CONFIGURAÇÃO GLOBAL =================
+      // Configuração
       const SUPABASE_URL = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqdmd6Ym5xbndycXh3bGJuZGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTU3OTYsImV4cCI6MjA2Njg3MTc5Nn0.tfOu-q0HTCtWTa8wOKWHfgoAl3LBdWULV5O3R2eV4vE";
+      const LOGIN_URL = "https://sarmtech.netlify.app/login/login.html";
 
-      // URLs dos sistemas (CORRIGIDO para o login)
-      const SITE_URL = "https://sarm-tech.netlify.app";
-      const SYSTEM_URL = "https://sarmtech.netlify.app";
-      const LOGIN_URL = `${SYSTEM_URL}/login/login.html`;
+      // Elementos do DOM
+      const loadingEl = document.getElementById("loading");
+      const successEl = document.getElementById("success");
+      const errorEl = document.getElementById("error");
+      const errorMessageEl = document.getElementById("errorMessage");
 
-      // ================= VARIÁVEL GLOBAL =================
-      let supabaseClient = null;
-
-      // ================= FUNÇÕES AUXILIARES =================
-      function showSection(sectionId) {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("success").style.display = "none";
-        document.getElementById("error").style.display = "none";
-        document.getElementById(sectionId).style.display = "block";
-      }
-
-      function showError(message) {
-        document.getElementById("errorMessage").textContent = message;
-        showSection("error");
+      // Funções auxiliares
+      function showLoading() {
+        loadingEl.style.display = "block";
+        successEl.style.display = "none";
+        errorEl.style.display = "none";
       }
 
       function showSuccess() {
-        showSection("success");
-        // Redireciona automaticamente após 5 segundos (CORRIGIDO)
+        loadingEl.style.display = "none";
+        successEl.style.display = "block";
+        errorEl.style.display = "none";
+
+        // Redireciona após 5 segundos
         setTimeout(() => {
           window.location.href = `${LOGIN_URL}?confirmed=true`;
         }, 5000);
       }
 
-      function addDebugInfo(text) {
-        const debugEl = document.getElementById("debug");
-        const contentEl = document.getElementById("debugContent");
-        contentEl.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${text}</div>`;
-        debugEl.style.display = "block";
+      function showError(message) {
+        loadingEl.style.display = "none";
+        successEl.style.display = "none";
+        errorEl.style.display = "block";
+        errorMessageEl.textContent = message;
       }
 
-      function initializeSupabase() {
-        if (!supabaseClient) {
-          supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          addDebugInfo("✅ Supabase inicializado");
-        }
-        return supabaseClient;
-      }
-
-      // Função para tentar confirmar manualmente via API
-      async function tryManualConfirmation() {
-        addDebugInfo("🔄 Tentando confirmação manual via API...");
+      // Função principal
+      async function confirmEmail() {
+        console.log("🔍 Iniciando confirmação de email...");
 
         try {
-          const supabase = initializeSupabase();
+          // 1. Extrair token da URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get("token");
+          const type = urlParams.get("type") || "signup";
 
-          // 1. Tenta fazer login com algum método
-          // Primeiro, tenta verificar se há sessão ativa
+          console.log("📊 Token recebido:", token ? "SIM" : "NÃO");
+          console.log("📊 Tipo:", type);
+
+          if (!token) {
+            throw new Error("Token não encontrado na URL");
+          }
+
+          // 2. Inicializar Supabase
+          const supabase = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+          );
+
+          // 3. Verificar OTP (MÉTODO CORRETO)
+          console.log("🔄 Verificando OTP...");
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: token,
+            type: type,
+          });
+
+          if (error) {
+            console.error("❌ Erro do Supabase:", error);
+
+            // Verificar se já está confirmado
+            if (error.message.includes("already confirmed")) {
+              console.log("✅ Email já estava confirmado");
+              showSuccess();
+              return;
+            }
+
+            // Tenta método alternativo
+            console.log("🔄 Tentando método alternativo...");
+            const { data: signInData, error: signInError } =
+              await supabase.auth.signInWithOtp({
+                token: token,
+                type: type,
+              });
+
+            if (signInError) {
+              // Verifica se o usuário já existe e tenta login
+              console.log("🔄 Verificando se usuário já existe...");
+
+              // Pega o email do token se possível (para debug)
+              const emailMatch = token.match(/email=([^&]+)/);
+              if (emailMatch) {
+                console.log("📧 Email detectado no token:", emailMatch[1]);
+              }
+
+              throw new Error(
+                "Não foi possível confirmar o email. Tente fazer login diretamente."
+              );
+            }
+
+            console.log("✅ Confirmado via método alternativo");
+          } else {
+            console.log("✅ Confirmado via verifyOtp");
+            console.log("👤 Dados do usuário:", data);
+          }
+
+          // 4. Verificar se a sessão foi criada
           const { data: sessionData, error: sessionError } =
             await supabase.auth.getSession();
 
-          if (!sessionError && sessionData?.session) {
-            addDebugInfo(
-              `✅ Sessão encontrada: ${sessionData.session.user.email}`
+          if (sessionError) {
+            console.warn(
+              "⚠️ Sem sessão ativa, mas email pode estar confirmado"
             );
-
-            // Verifica se o email já está confirmado
-            if (sessionData.session.user.email_confirmed_at) {
-              addDebugInfo("📅 Email já confirmado anteriormente");
-              return { success: true, user: sessionData.session.user };
-            }
-          }
-
-          // 2. Se não tem sessão, tenta verificar o usuário
-          const { data: userData, error: userError } =
-            await supabase.auth.getUser();
-
-          if (!userError && userData?.user) {
-            addDebugInfo(`👤 Usuário obtido: ${userData.user.email}`);
-
-            if (userData.user.email_confirmed_at) {
-              addDebugInfo("✅ Email já estava confirmado");
-              return { success: true, user: userData.user };
-            }
-          }
-
-          // 3. Se chegou aqui, o email provavelmente NÃO está confirmado
-          addDebugInfo("⚠️ Não foi possível confirmar o email automaticamente");
-          return { success: false, message: "Email não confirmado" };
-        } catch (error) {
-          addDebugInfo(`❌ Erro na confirmação manual: ${error.message}`);
-          return { success: false, message: error.message };
-        }
-      }
-
-      // ================= LÓGICA PRINCIPAL =================
-      async function processEmailConfirmation() {
-        addDebugInfo("🚀 Iniciando processamento de confirmação...");
-        addDebugInfo(`🌐 URL atual: ${window.location.href}`);
-
-        try {
-          // 1. Inicializar Supabase
-          addDebugInfo("🔧 Inicializando Supabase...");
-          const supabase = initializeSupabase();
-
-          // 2. Extrair parâmetros da URL
-          const urlParams = new URLSearchParams(window.location.search);
-          const hashParams = new URLSearchParams(
-            window.location.hash.substring(1)
-          );
-
-          // 3. ANALISAR ERRO NA URL (você está recebendo um erro!)
-          const error = urlParams.get("error") || hashParams.get("error");
-          const error_description =
-            urlParams.get("error_description") ||
-            hashParams.get("error_description");
-
-          if (error) {
-            addDebugInfo(
-              `❌ ERRO DO SUPABASE: ${error} - ${error_description}`
+          } else if (sessionData.session) {
+            console.log(
+              "✅ Sessão ativa criada:",
+              sessionData.session.user.email
             );
-
-            // Se o erro for "already confirmed" ou similar, considera sucesso
-            if (
-              error_description &&
-              (error_description.toLowerCase().includes("already confirmed") ||
-                error_description.toLowerCase().includes("already verified") ||
-                error_description
-                  .toLowerCase()
-                  .includes("user already confirmed"))
-            ) {
-              addDebugInfo(
-                "✅ Email já estava confirmado (detectado pelo erro)"
-              );
-              showSuccess();
-              return;
-            }
-
-            // Para outros erros, tenta confirmação manual
-            addDebugInfo("⚠️ Erro na URL, tentando confirmação manual...");
-            const manualResult = await tryManualConfirmation();
-
-            if (manualResult.success) {
-              addDebugInfo(
-                `🎉 Confirmação manual bem-sucedida! Usuário: ${manualResult.user.email}`
-              );
-              showSuccess();
-              return;
-            }
           }
 
-          // 4. Verificar parâmetros normais
-          const token = urlParams.get("token") || hashParams.get("token");
-          const token_hash =
-            urlParams.get("token_hash") || hashParams.get("token_hash");
-          const type =
-            urlParams.get("type") || hashParams.get("type") || "signup";
-          const access_token = hashParams.get("access_token");
-
-          addDebugInfo(
-            `📊 Parâmetros: token=${token ? "SIM" : "NÃO"}, token_hash=${
-              token_hash ? "SIM" : "NÃO"
-            }, type=${type}, access_token=${access_token ? "SIM" : "NÃO"}`
-          );
-
-          // 5. Se tiver access_token no hash (Magic Link funcionou)
-          if (access_token) {
-            addDebugInfo("🎯 Magic Link detectado na URL");
-
-            try {
-              // Verifica se já tem sessão
-              const { data: sessionData, error: sessionError } =
-                await supabase.auth.getSession();
-
-              if (sessionError) {
-                addDebugInfo(`❌ Erro na sessão: ${sessionError.message}`);
-                // Tenta usar o access_token diretamente
-                const { data: userData, error: userError } =
-                  await supabase.auth.getUser(access_token);
-
-                if (userError) throw userError;
-
-                addDebugInfo(
-                  `✅ Usuário autenticado via token: ${userData.user.email}`
-                );
-                showSuccess();
-                return;
-              }
-
-              if (sessionData.session) {
-                addDebugInfo(
-                  `✅ Sessão ativa: ${sessionData.session.user.email}`
-                );
-                showSuccess();
-                return;
-              }
-            } catch (hashError) {
-              addDebugInfo(
-                `⚠️ Erro no processamento do hash: ${hashError.message}`
-              );
-            }
-          }
-
-          // 6. Se tiver token ou token_hash (OTP tradicional)
-          if (token || token_hash) {
-            addDebugInfo("🔑 Processando OTP/Tokens...");
-
-            try {
-              // Tenta verificar OTP
-              const { data: otpData, error: otpError } =
-                await supabase.auth.verifyOtp({
-                  token_hash: token_hash || token,
-                  type: type,
-                });
-
-              if (otpError) {
-                addDebugInfo(`❌ Erro OTP: ${otpError.message}`);
-
-                // Tenta método alternativo
-                const { data: signInData, error: signInError } =
-                  await supabase.auth.signInWithOtp({
-                    token: token || token_hash,
-                    type: type,
-                  });
-
-                if (signInError) throw signInError;
-
-                addDebugInfo("✅ Confirmado via signInWithOtp");
-                showSuccess();
-                return;
-              }
-
-              addDebugInfo("✅ Confirmado via verifyOtp");
-              showSuccess();
-              return;
-            } catch (otpError) {
-              addDebugInfo(`❌ Falha nos métodos OTP: ${otpError.message}`);
-            }
-          }
-
-          // 7. Se chegou aqui sem parâmetros específicos, tenta confirmação manual
-          addDebugInfo(
-            "🔍 Nenhum parâmetro específico, tentando confirmação manual..."
-          );
-          const manualCheck = await tryManualConfirmation();
-
-          if (manualCheck.success) {
-            addDebugInfo("✅ Confirmação manual bem-sucedida!");
-            showSuccess();
-            return;
-          }
-
-          // 8. Se nada funcionou, mas não temos erro crítico
-          addDebugInfo("ℹ️ Processamento concluído. Mostrando opções...");
-
-          // Mostra mensagem informativa
-          showError(
-            "O link de confirmação pode ter expirado ou já sido usado.<br><br>" +
-              "<strong>Sugestões:</strong><br>" +
-              "1. Tente fazer login diretamente<br>" +
-              "2. Solicite um novo email de confirmação<br>" +
-              "3. Entre em contato com o suporte"
-          );
+          // 5. Sucesso
+          showSuccess();
         } catch (error) {
-          addDebugInfo(`💥 ERRO CRÍTICO: ${error.message}`);
-          console.error("Erro completo:", error);
+          console.error("❌ Erro na confirmação:", error);
 
-          // Mensagens amigáveis baseadas no erro
-          let userMessage = "Não foi possível confirmar seu email. ";
+          let userMessage = "Erro ao confirmar email: ";
 
           if (error.message.includes("already confirmed")) {
             userMessage = "Seu email já foi confirmado anteriormente.";
@@ -449,43 +274,25 @@
               "Este link expirou. Solicite um novo email de confirmação.";
           } else if (error.message.includes("Invalid")) {
             userMessage = "Link de confirmação inválido ou já utilizado.";
-          } else if (error.message.includes("server_error")) {
-            userMessage =
-              "Erro no servidor. O email pode já estar confirmado. Tente fazer login.";
+          } else if (error.message.includes("token")) {
+            userMessage = "Token inválido ou expirado.";
           } else {
-            userMessage += "Por favor, tente fazer login diretamente.";
+            userMessage += error.message;
           }
 
           showError(userMessage);
         }
       }
 
-      // ================= INICIALIZAÇÃO =================
-      document.addEventListener("DOMContentLoaded", () => {
-        // Para debugging, pode ativar mostrando parâmetros
-        if (
-          window.location.search.includes("debug=true") ||
-          window.location.hash.includes("debug=true")
-        ) {
-          document.getElementById("debug").style.display = "block";
-        }
+      // Iniciar quando a página carregar
+      document.addEventListener("DOMContentLoaded", confirmEmail);
 
-        // Inicializa o Supabase uma vez
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Adiciona listener para mudanças de estado
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-          addDebugInfo(`🔄 Auth State Change: ${event}`);
-
-          if (event === "SIGNED_IN") {
-            addDebugInfo("✅ Usuário acabou de fazer login");
-            showSuccess();
-          }
-        });
-
-        // Inicia o processamento
-        processEmailConfirmation();
-      });
+      // Adicionar para debug no console
+      console.log("🌐 URL completa:", window.location.href);
+      console.log(
+        "🔍 Parâmetros da URL:",
+        Object.fromEntries(new URLSearchParams(window.location.search))
+      );
     </script>
   </body>
 </html>
