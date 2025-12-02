@@ -547,3 +547,10 @@ window.userData = userData;
 window.migrateTrialToPaid = migrateTrialToPaid;
 
 console.log("✅ cadastro-pagamento.js carregado com sucesso!");
+
+console.log("🔗 Link de confirmação que seria enviado:");
+console.log(
+  `https://sarm-tech.netlify.app/confirm.html?redirect_to=${encodeURIComponent(
+    "https://sarmtech.netlify.app/login/login.html"
+  )}`
+);
