@@ -1,4 +1,4 @@
-// assets/js/cadastro-pagamento.js - VERSÃO SIMPLIFICADA
+// assets/js/cadastro-pagamento.js - VERSÃO CORRIGIDA COM PKCE
 import { supabase } from "./supabaseClient.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -103,17 +103,15 @@ async function createTrialAccount() {
 
     console.log("📝 Criando conta trial para:", userData.email);
 
-    // PASSO 1: Verificar se email já existe
-    const { data: existingEmail } = await supabase
+    // PASSO 1: Verificar se email já existe no user_profiles
+    const { data: existingProfile } = await supabase
       .from("user_profiles")
       .select("email")
       .eq("email", userData.email)
-      .single();
+      .maybeSingle();
 
-    if (existingEmail) {
-      throw new Error(
-        "Este email já está cadastrado. Faça login ou use outro email."
-      );
+    if (existingProfile) {
+      throw new Error("Este email já está cadastrado.");
     }
 
     // PASSO 2: Verificar se CPF/CNPJ já existe
@@ -121,14 +119,20 @@ async function createTrialAccount() {
       .from("user_profiles")
       .select("cpf_cnpj")
       .eq("cpf_cnpj", userData.cpf_cnpj)
-      .single();
+      .maybeSingle();
 
     if (existingDoc) {
       throw new Error("Este CPF/CNPJ já está cadastrado.");
     }
 
-    // PASSO 3: Criar usuário no Supabase Auth
+    // PASSO 3: Criar usuário no Supabase Auth com PKCE
     console.log("🔐 Criando usuário no Auth...");
+
+    // URL correta para redirecionamento
+    const redirectTo = window.location.origin.includes("sarm-tech")
+      ? "https://sarmtech.netlify.app/confirm.html"
+      : `${window.location.origin}/confirm.html`;
+
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.senha,
@@ -138,26 +142,37 @@ async function createTrialAccount() {
           cpf_cnpj: userData.cpf_cnpj,
           phone: userData.telefone,
         },
-        // Com PKCE, não precisa de redirect URL
+        emailRedirectTo: redirectTo,
       },
     });
 
     if (authError) {
       console.error("Erro no Auth:", authError);
-      if (authError.message.includes("Email rate limit")) {
+
+      // Tratar erros específicos
+      if (authError.message.includes("already registered")) {
+        throw new Error("Este email já está cadastrado. Faça login.");
+      } else if (authError.message.includes("rate limit")) {
         throw new Error("Muitas tentativas. Aguarde alguns minutos.");
+      } else if (authError.message.includes("password")) {
+        throw new Error("A senha não atende aos requisitos mínimos.");
       }
-      throw new Error(`Erro de autenticação: ${authError.message}`);
+
+      throw new Error(`Erro ao criar conta: ${authError.message}`);
     }
 
     if (!authData.user) {
-      throw new Error("Não foi possível criar o usuário.");
+      throw new Error("Não foi possível criar o usuário. Tente novamente.");
     }
 
     const userId = authData.user.id;
     console.log("✅ Usuário Auth criado:", userId);
 
-    // PASSO 4: Criar perfil do usuário
+    // PASSO 4: Criar perfil do usuário (mesmo sem email confirmado)
+    const trialStart = new Date();
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 30);
+
     const { error: profileError } = await supabase
       .from("user_profiles")
       .upsert({
@@ -166,22 +181,21 @@ async function createTrialAccount() {
         full_name: userData.nome,
         cpf_cnpj: userData.cpf_cnpj,
         phone: userData.telefone,
-        plan_id: 0, // Plano Trial
+        plan_id: 0,
         subscription_status: "trialing",
+        trial_start: trialStart.toISOString(),
+        trial_end: trialEnd.toISOString(),
+        trial_days_used: 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
 
     if (profileError) {
-      console.error("Erro no perfil:", profileError);
-      // Não impede o processo, apenas loga o erro
+      console.error("Erro ao criar perfil:", profileError);
+      // Não impede o processo principal
     }
 
     // PASSO 5: Criar assinatura trial
-    const trialStart = new Date();
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 30);
-
     const { error: subscriptionError } = await supabase
       .from("subscriptions")
       .insert({
@@ -197,7 +211,6 @@ async function createTrialAccount() {
 
     if (subscriptionError) {
       console.warn("Aviso na assinatura:", subscriptionError);
-      // Não impede o processo
     }
 
     // PASSO 6: Criar company_profile básico
@@ -216,14 +229,24 @@ async function createTrialAccount() {
       console.warn("Aviso no company_profile:", companyError);
     }
 
-    // SUCESSO!
+    // SUCESSO - Usuário criado, email de confirmação enviado
     console.log("🎉 Conta trial criada com sucesso!");
+    console.log("📧 Email de confirmação enviado para:", userData.email);
 
     // Mostrar modal de sucesso
     showSuccessModal(userData, trialEnd);
   } catch (error) {
     console.error("❌ Erro ao criar conta:", error);
-    alert(`Erro: ${error.message}`);
+
+    // Mensagem amigável para o usuário
+    let errorMessage = error.message;
+    if (error.message.includes("duplicate key")) {
+      errorMessage = "Este email ou CPF/CNPJ já está cadastrado.";
+    } else if (error.message.includes("network")) {
+      errorMessage = "Problema de conexão. Verifique sua internet.";
+    }
+
+    alert(`Erro: ${errorMessage}`);
   } finally {
     // Reativar botão
     btnCadastrar.disabled = false;
@@ -232,10 +255,10 @@ async function createTrialAccount() {
   }
 }
 
-// Modal de sucesso
+// Modal de sucesso (SEM redirecionamento automático)
 function showSuccessModal(userData, trialEnd) {
   const modalHtml = `
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1050;">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-success text-white">
@@ -243,34 +266,58 @@ function showSuccessModal(userData, trialEnd) {
               <i class="bi bi-check-circle-fill me-2"></i>
               Conta Criada com Sucesso!
             </h5>
+            <button type="button" class="btn-close btn-close-white" onclick="closeSuccessModal()"></button>
           </div>
           <div class="modal-body">
             <div class="text-center mb-4">
               <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
             </div>
-            <h4 class="text-center mb-3">🎉 Parabéns!</h4>
-            <p class="text-center">Sua conta trial foi criada com sucesso.</p>
             
-            <div class="alert alert-info">
-              <strong>Detalhes da sua conta:</strong>
-              <ul class="mb-0 mt-2">
-                <li><strong>Email:</strong> ${userData.email}</li>
-                <li><strong>Nome:</strong> ${userData.nome}</li>
-                <li><strong>Trial válido até:</strong> ${trialEnd.toLocaleDateString(
-                  "pt-BR"
-                )}</li>
-                <li><strong>Dias restantes:</strong> 30 dias</li>
-              </ul>
+            <div class="alert alert-success">
+              <h5 class="alert-heading">🎉 Parabéns!</h5>
+              <p>Sua conta trial de 30 dias foi criada com sucesso.</p>
+            </div>
+            
+            <div class="card mb-3">
+              <div class="card-body">
+                <h6 class="card-title">📋 Detalhes da sua conta:</h6>
+                <ul class="list-unstyled">
+                  <li><strong>👤 Nome:</strong> ${userData.nome}</li>
+                  <li><strong>📧 Email:</strong> ${userData.email}</li>
+                  <li><strong>📅 Trial válido até:</strong> ${trialEnd.toLocaleDateString(
+                    "pt-BR"
+                  )}</li>
+                  <li><strong>⏳ Dias restantes:</strong> 30 dias</li>
+                </ul>
+              </div>
             </div>
             
             <div class="alert alert-warning">
-              <i class="bi bi-envelope me-2"></i>
-              <strong>Verifique seu email!</strong><br>
-              Enviamos um link de confirmação para ${userData.email}
+              <h6><i class="bi bi-envelope-exclamation me-2"></i>Importante: Confirme seu email</h6>
+              <p class="mb-0">
+                Enviamos um email de confirmação para <strong>${
+                  userData.email
+                }</strong>.
+                <br>
+                <small class="text-muted">Verifique sua caixa de entrada e spam.</small>
+              </p>
+            </div>
+            
+            <div class="alert alert-info">
+              <h6><i class="bi bi-info-circle me-2"></i>Próximos passos:</h6>
+              <ol class="mb-0">
+                <li>Verifique seu email e clique no link de confirmação</li>
+                <li>Faça login no sistema</li>
+                <li>Comece a usar sua conta trial gratuita</li>
+              </ol>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" onclick="window.location.href='https://sarmtech.netlify.app/login/login.html'">
+            <button type="button" class="btn btn-outline-secondary" onclick="closeSuccessModal()">
+              <i class="bi bi-x-circle me-2"></i>
+              Fechar
+            </button>
+            <button type="button" class="btn btn-primary" onclick="goToLogin()">
               <i class="bi bi-box-arrow-in-right me-2"></i>
               Ir para o Login
             </button>
@@ -280,25 +327,32 @@ function showSuccessModal(userData, trialEnd) {
     </div>
   `;
 
+  // Remover modal existente se houver
+  const existingModal = document.getElementById("successModalContainer");
+  if (existingModal) existingModal.remove();
+
   // Adicionar modal ao body
   const modalContainer = document.createElement("div");
   modalContainer.id = "successModalContainer";
   modalContainer.innerHTML = modalHtml;
   document.body.appendChild(modalContainer);
-
-  // Fechar modal ao clicar fora
-  modalContainer.addEventListener("click", function (e) {
-    if (e.target === this) {
-      this.remove();
-      window.location.href = "https://sarmtech.netlify.app/login/login.html";
-    }
-  });
-
-  // Redirecionar após 15 segundos
-  setTimeout(() => {
-    window.location.href = "https://sarmtech.netlify.app/login/login.html";
-  }, 15000);
+  document.body.style.overflow = "hidden"; // Previne scroll
 }
+
+// Funções auxiliares para o modal
+window.closeSuccessModal = function () {
+  const modalContainer = document.getElementById("successModalContainer");
+  if (modalContainer) {
+    modalContainer.remove();
+    document.body.style.overflow = "auto";
+  }
+};
+
+window.goToLogin = function () {
+  window.closeSuccessModal();
+  window.location.href = "https://sarmtech.netlify.app/login/login.html";
+};
 
 // Adicionar ao window para acesso global
 window.createTrialAccount = createTrialAccount;
+window.validateForm = validateForm;
