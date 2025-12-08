@@ -255,6 +255,48 @@ async function createTrialAccount() {
   }
 }
 
+// Função para confirmar automaticamente o email
+async function autoConfirmEmail(userId, email) {
+  try {
+    console.log("🔧 Confirmando email automaticamente...");
+
+    // 1. Atualizar auth.users (via admin API se tiver service_role key)
+    // OU pule este passo se desabilitou confirmação no Supabase
+
+    // 2. Atualizar user_profiles (CRÍTICO - seu sistema usa isso)
+    const { error: profileError } = await supabase
+      .from("user_profiles")
+      .update({
+        email_confirmed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", userId);
+
+    if (profileError) {
+      console.warn(
+        "⚠️ Não foi possível atualizar user_profiles:",
+        profileError
+      );
+      // Tenta criar se não existir
+      await supabase.from("user_profiles").upsert({
+        id: userId,
+        email: email,
+        email_confirmed_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    console.log("✅ Email confirmado automaticamente no sistema");
+  } catch (error) {
+    console.error("❌ Erro na confirmação automática:", error);
+    // Não quebra o fluxo principal
+  }
+}
+
+// Chame a função DEPOIS de authData.user (linha ~169)
+await autoConfirmEmail(userId, userData.email);
+
 // Modal de sucesso (SEM redirecionamento automático)
 function showSuccessModal(userData, trialEnd) {
   const modalHtml = `
