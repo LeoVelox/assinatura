@@ -1,16 +1,17 @@
-// assets/js/cadastro-pagamento.js - VERSÃO CORRIGIDA COM CONFIRMAÇÃO AUTOMÁTICA
+// assets/js/cadastro-pagamento.js
+// Versão revisada — CONFIRMAÇÃO AUTOMÁTICA, sem redirect_to que causava "Database error updating user"
 import { supabase } from "./supabaseClient.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   console.log("🚀 Página de cadastro Trial carregada");
 
-  // Toggle de senha
+  // Toggle password visibility
   const togglePassword = document.querySelector(".toggle-password");
   if (togglePassword) {
-    togglePassword.addEventListener("click", function () {
+    togglePassword.addEventListener("click", () => {
       const passwordInput = document.getElementById("senha");
-      const icon = this.querySelector("i");
-
+      const icon = togglePassword.querySelector("i");
+      if (!passwordInput || !icon) return;
       if (passwordInput.type === "password") {
         passwordInput.type = "text";
         icon.classList.replace("bi-eye", "bi-eye-slash");
@@ -21,24 +22,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Evento de cadastro
+  // Form submit
   const signupForm = document.getElementById("signup-form");
   if (signupForm) {
-    signupForm.addEventListener("submit", async function (e) {
+    signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       await createTrialAccount();
     });
   }
 });
 
-// Validação simplificada
+// Validação simples do formulário
 function validateForm() {
-  const nome = document.getElementById("nome").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const cpf_cnpj = document.getElementById("cpf_cnpj").value.trim();
-  const senha = document.getElementById("senha").value;
-  const terms = document.getElementById("terms").checked;
+  const nome = document.getElementById("nome")?.value?.trim() || "";
+  const email = document.getElementById("email")?.value?.trim() || "";
+  const cpf_cnpj = document.getElementById("cpf_cnpj")?.value?.trim() || "";
+  const senha = document.getElementById("senha")?.value || "";
+  const terms = document.getElementById("terms")?.checked || false;
 
+  // reset validação visual
   document
     .querySelectorAll(".is-invalid")
     .forEach((el) => el.classList.remove("is-invalid"));
@@ -46,12 +48,12 @@ function validateForm() {
   let isValid = true;
 
   if (!nome) {
-    document.getElementById("nome").classList.add("is-invalid");
+    document.getElementById("nome")?.classList.add("is-invalid");
     isValid = false;
   }
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    document.getElementById("email").classList.add("is-invalid");
+    document.getElementById("email")?.classList.add("is-invalid");
     isValid = false;
   }
 
@@ -60,12 +62,12 @@ function validateForm() {
     !cleanCpfCnpj ||
     (cleanCpfCnpj.length !== 11 && cleanCpfCnpj.length !== 14)
   ) {
-    document.getElementById("cpf_cnpj").classList.add("is-invalid");
+    document.getElementById("cpf_cnpj")?.classList.add("is-invalid");
     isValid = false;
   }
 
   if (!senha || senha.length < 8) {
-    document.getElementById("senha").classList.add("is-invalid");
+    document.getElementById("senha")?.classList.add("is-invalid");
     isValid = false;
   }
 
@@ -77,34 +79,34 @@ function validateForm() {
   return isValid;
 }
 
-// Função principal de criação de conta
+// Função principal de criação da conta (fluxo: signUp sem redirect, upsert profile, criar assinatura, company_profile)
 async function createTrialAccount() {
   if (!validateForm()) return;
 
   const btnCadastrar = document.getElementById("btn-cadastrar");
-  const submitText = btnCadastrar.querySelector(".submit-text");
+  const submitText = btnCadastrar?.querySelector(".submit-text");
   const spinner = document.getElementById("spinner");
 
-  btnCadastrar.disabled = true;
-  submitText.classList.add("d-none");
-  spinner.classList.remove("d-none");
+  if (btnCadastrar) btnCadastrar.disabled = true;
+  if (submitText) submitText.classList.add("d-none");
+  if (spinner) spinner.classList.remove("d-none");
 
   try {
-    // Coletar dados
+    // Coleta dados do formulário
     const userData = {
-      nome: document.getElementById("nome").value.trim(),
-      email: document.getElementById("email").value.trim(),
-      cpf_cnpj: document.getElementById("cpf_cnpj").value.replace(/\D/g, ""),
-      senha: document.getElementById("senha").value,
-      telefone: document.getElementById("telefone").value.trim() || null,
+      nome: document.getElementById("nome")?.value?.trim(),
+      email: document.getElementById("email")?.value?.trim(),
+      cpf_cnpj: document.getElementById("cpf_cnpj")?.value?.replace(/\D/g, ""),
+      senha: document.getElementById("senha")?.value,
+      telefone: document.getElementById("telefone")?.value?.trim() || null,
     };
 
     console.log("📝 Criando conta trial para:", userData.email);
 
-    // Verificar email duplicado
+    // Verifica duplicidade em user_profiles (controle no seu domínio)
     const { data: existingEmail } = await supabase
       .from("user_profiles")
-      .select("email")
+      .select("id")
       .eq("email", userData.email)
       .maybeSingle();
 
@@ -112,10 +114,9 @@ async function createTrialAccount() {
       throw new Error("Este email já está cadastrado.");
     }
 
-    // Verificar CPF duplicado
     const { data: existingDoc } = await supabase
       .from("user_profiles")
-      .select("cpf_cnpj")
+      .select("id")
       .eq("cpf_cnpj", userData.cpf_cnpj)
       .maybeSingle();
 
@@ -123,123 +124,159 @@ async function createTrialAccount() {
       throw new Error("Este CPF/CNPJ já está cadastrado.");
     }
 
-    // Criar usuário no Auth — SEM metadata
-    console.log("🔐 Criando usuário no Auth...");
+    // ======= SIGNUP =======
+    // IMPORTANT: NÃO enviar redirect/emailRedirectTo aqui para evitar conflito com confirmação automática.
+    console.log("🔐 Criando usuário no Auth (sem redirect)...");
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.senha,
-      options: {
-        emailRedirectTo: "https://sarmtech.netlify.app/confirm.html",
-      },
+      // sem options.emailRedirectTo para modo de confirmação automática
     });
 
     if (authError) {
       console.error("❌ Erro no Auth:", authError);
-      throw new Error(`Erro ao criar conta: ${authError.message}`);
+      // tratar mensagens comuns de forma amigável
+      if (authError.message?.toLowerCase()?.includes("already registered")) {
+        throw new Error("Este email já está cadastrado. Tente fazer login.");
+      }
+      if (
+        authError.status === 429 ||
+        authError.message?.toLowerCase()?.includes("rate limit")
+      ) {
+        throw new Error(
+          "Muitas tentativas. Aguarde alguns minutos e tente novamente."
+        );
+      }
+      throw new Error(
+        `Erro ao criar conta: ${authError.message || authError.toString()}`
+      );
     }
 
-    if (!authData.user) {
-      throw new Error("Erro inesperado ao criar usuário.");
+    if (!authData || !authData.user) {
+      throw new Error(
+        "Erro inesperado ao criar usuário (sem dados retornados)."
+      );
     }
 
     const userId = authData.user.id;
     console.log("✅ Usuário Auth criado:", userId);
 
-    // Auto confirmação
-    await autoConfirmEmail(userId, userData.email);
+    // ======= AUTO CONFIRM (apenas atualiza sua tabela de perfis)
+    // Não usamos service_role no frontend — apenas marcamos como confirmado em user_profiles
+    await safeUpsertUserProfile(userId, userData);
 
-    // Criar perfil do usuário
+    // ======= Criar assinatura trial
     const trialStart = new Date();
-    const trialEnd = new Date();
+    const trialEnd = new Date(trialStart);
     trialEnd.setDate(trialEnd.getDate() + 30);
 
-    await supabase.from("user_profiles").upsert({
-      id: userId,
+    const { error: subscriptionError } = await supabase
+      .from("subscriptions")
+      .insert({
+        user_id: userId,
+        plan_id: 0,
+        status: "trialing",
+        payment_method: "trial",
+        current_period_start: trialStart.toISOString(),
+        current_period_end: trialEnd.toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+    if (subscriptionError) {
+      console.warn(
+        "⚠️ Aviso: erro ao criar subscription (não crítico):",
+        subscriptionError
+      );
+    }
+
+    // ======= Company profile
+    const { error: companyError } = await supabase
+      .from("company_profiles")
+      .upsert({
+        user_id: userId,
+        name: `${userData.nome} - Empresa`,
+        email: userData.email,
+        phone: userData.telefone,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+    if (companyError) {
+      console.warn(
+        "⚠️ Aviso: erro ao criar company_profiles (não crítico):",
+        companyError
+      );
+    }
+
+    console.log("🎉 Conta criada com sucesso!");
+    showSuccessModal(userData, trialEnd);
+  } catch (error) {
+    console.error("❌ Erro ao criar conta:", error);
+    // mensagem amigável
+    const msg = error && error.message ? error.message : String(error);
+    alert(`Erro: ${msg}`);
+  } finally {
+    if (btnCadastrar) btnCadastrar.disabled = false;
+    if (submitText) submitText.classList.remove("d-none");
+    if (spinner) spinner.classList.add("d-none");
+  }
+}
+
+// Upsert do perfil do usuário de forma segura (marca email confirmado no perfil local)
+async function safeUpsertUserProfile(userId, userData) {
+  try {
+    const now = new Date().toISOString();
+    const payload = {
+      id: userId, // usar id do auth como pk
       email: userData.email,
       full_name: userData.nome,
       cpf_cnpj: userData.cpf_cnpj,
       phone: userData.telefone,
       plan_id: 0,
       subscription_status: "trialing",
-      trial_start: trialStart.toISOString(),
-      trial_end: trialEnd.toISOString(),
+      trial_start: now,
+      trial_end: new Date(
+        new Date(now).setDate(new Date(now).getDate() + 30)
+      ).toISOString(),
       trial_days_used: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      email_confirmed_at: new Date().toISOString(),
-    });
+      created_at: now,
+      updated_at: now,
+      email_confirmed_at: now, // marca como confirmado no perfil local
+    };
 
-    // Criar assinatura trial
-    await supabase.from("subscriptions").insert({
-      user_id: userId,
-      plan_id: 0,
-      status: "trialing",
-      payment_method: "trial",
-      current_period_start: trialStart.toISOString(),
-      current_period_end: trialEnd.toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-    // Company profile
-    await supabase.from("company_profiles").upsert({
-      user_id: userId,
-      name: `${userData.nome} - Empresa`,
-      email: userData.email,
-      phone: userData.telefone,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-    console.log("🎉 Conta criada com sucesso!");
-    showSuccessModal(userData, trialEnd);
-  } catch (error) {
-    console.error("❌ Erro ao criar conta:", error);
-    alert(error.message);
-  } finally {
-    btnCadastrar.disabled = false;
-    submitText.classList.remove("d-none");
-    spinner.classList.add("d-none");
+    const { error } = await supabase.from("user_profiles").upsert(payload);
+    if (error) {
+      // Se a inserção falhar por constraint do banco, apenas logamos — não interrompemos totalmente
+      console.warn("⚠️ Falha ao upsert em user_profiles:", error);
+    } else {
+      console.log("✅ user_profiles atualizado/criado com sucesso");
+    }
+  } catch (err) {
+    console.error("❌ Exceção no safeUpsertUserProfile:", err);
   }
 }
 
-// Confirmar email automaticamente
-async function autoConfirmEmail(userId, email) {
-  try {
-    console.log("🔧 Confirmando email automaticamente...");
-
-    await supabase
-      .from("user_profiles")
-      .update({
-        email_confirmed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", userId);
-
-    console.log("📌 Email confirmado automaticamente!");
-  } catch (error) {
-    console.error("⚠️ Falha ao confirmar email automaticamente:", error);
-  }
-}
-
-// Modal de sucesso
+// Modal de sucesso — sem redirecionamento automático
 function showSuccessModal(userData, trialEnd) {
+  // remover modal anterior se existir
+  const existing = document.getElementById("successModalContainer");
+  if (existing) existing.remove();
+
   const modalHtml = `
-    <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); position: fixed; inset: 0; z-index: 1050;">
+    <div class="modal fade show d-block" id="successModal" tabindex="-1" style="background: rgba(0,0,0,0.5); position: fixed; inset: 0; z-index: 1050;">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-success text-white">
             <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i>Conta Criada com Sucesso!</h5>
-            <button class="btn-close btn-close-white" onclick="closeSuccessModal()"></button>
+            <button type="button" class="btn-close btn-close-white" onclick="closeSuccessModal()"></button>
           </div>
           <div class="modal-body">
-            <div class="text-center mb-4">
-              <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+            <div class="text-center mb-3">
+              <i class="bi bi-check-circle" style="font-size: 3.5rem; color: #198754;"></i>
             </div>
-
-            <p class="text-center">Sua conta trial está ativa por 30 dias.</p>
-
+            <p class="text-center">Sua conta trial de 30 dias foi criada com sucesso.</p>
             <ul class="list-unstyled">
               <li><strong>Nome:</strong> ${userData.nome}</li>
               <li><strong>Email:</strong> ${userData.email}</li>
@@ -247,8 +284,10 @@ function showSuccessModal(userData, trialEnd) {
                 "pt-BR"
               )}</li>
             </ul>
+            <div class="alert alert-info mt-3">
+              <small>Verifique sua caixa de entrada (caso precise do email) e use o login para acessar o sistema.</small>
+            </div>
           </div>
-
           <div class="modal-footer">
             <button class="btn btn-outline-secondary" onclick="closeSuccessModal()">Fechar</button>
             <button class="btn btn-primary" onclick="goToLogin()">Ir para o Login</button>
@@ -262,17 +301,20 @@ function showSuccessModal(userData, trialEnd) {
   cont.id = "successModalContainer";
   cont.innerHTML = modalHtml;
   document.body.appendChild(cont);
+  document.body.style.overflow = "hidden";
 }
 
 window.closeSuccessModal = function () {
   const modal = document.getElementById("successModalContainer");
   if (modal) modal.remove();
+  document.body.style.overflow = "auto";
 };
 
 window.goToLogin = function () {
+  window.closeSuccessModal();
   window.location.href = "https://sarmtech.netlify.app/login/login.html";
 };
 
-// Export global
+// Export globals
 window.createTrialAccount = createTrialAccount;
 window.validateForm = validateForm;
