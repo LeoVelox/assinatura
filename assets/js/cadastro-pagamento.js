@@ -272,9 +272,6 @@ async function autoConfirmEmail(userId, email) {
   }
 }
 
-// Chame a função DEPOIS de authData.user (linha ~169)
-await autoConfirmEmail(userId, userData.email);
-
 // Modal de sucesso (SEM redirecionamento automático)
 function showSuccessModal(userData, trialEnd) {
   const modalHtml = `
