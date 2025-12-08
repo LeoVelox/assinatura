@@ -103,7 +103,7 @@ async function createTrialAccount() {
 
     console.log("📝 Criando conta trial para:", userData.email);
 
-    // PASSO 1: Verificar se email já existe no user_profiles
+    // PASSO 1: Verificar se email já existe
     const { data: existingProfile } = await supabase
       .from("user_profiles")
       .select("email")
@@ -125,13 +125,8 @@ async function createTrialAccount() {
       throw new Error("Este CPF/CNPJ já está cadastrado.");
     }
 
-    // PASSO 3: Criar usuário no Supabase Auth com PKCE
+    // PASSO 3: Criar usuário no Supabase Auth
     console.log("🔐 Criando usuário no Auth...");
-
-    // URL correta para redirecionamento
-    const redirectTo = window.location.origin.includes("sarm-tech")
-      ? "https://sarmtech.netlify.app/confirm.html"
-      : `${window.location.origin}/confirm.html`;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: userData.email,
@@ -139,36 +134,28 @@ async function createTrialAccount() {
       options: {
         data: {
           full_name: userData.nome,
-          cpf_cnpj: userData.cpf_cnpj,
+          cpf_cnpj: userData.cpfCnpj,
           phone: userData.telefone,
         },
-        emailRedirectTo: "https://sarmtech.netlify.app/confirm.html",
       },
     });
 
     if (authError) {
       console.error("Erro no Auth:", authError);
-
-      // Tratar erros específicos
-      if (authError.message.includes("already registered")) {
-        throw new Error("Este email já está cadastrado. Faça login.");
-      } else if (authError.message.includes("rate limit")) {
-        throw new Error("Muitas tentativas. Aguarde alguns minutos.");
-      } else if (authError.message.includes("password")) {
-        throw new Error("A senha não atende aos requisitos mínimos.");
-      }
-
       throw new Error(`Erro ao criar conta: ${authError.message}`);
     }
 
     if (!authData.user) {
-      throw new Error("Não foi possível criar o usuário. Tente novamente.");
+      throw new Error("Não foi possível criar o usuário.");
     }
 
     const userId = authData.user.id;
     console.log("✅ Usuário Auth criado:", userId);
 
-    // PASSO 4: Criar perfil do usuário (mesmo sem email confirmado)
+    // ⭐⭐ CORREÇÃO: CONFIRMAR EMAIL AUTOMATICAMENTE ⭐⭐
+    await autoConfirmEmail(userId, userData.email);
+
+    // PASSO 4: Criar perfil do usuário
     const trialStart = new Date();
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 30);
@@ -186,13 +173,13 @@ async function createTrialAccount() {
         trial_start: trialStart.toISOString(),
         trial_end: trialEnd.toISOString(),
         trial_days_used: 0,
+        email_confirmed_at: new Date().toISOString(), // ⭐ Já adiciona aqui também
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
 
     if (profileError) {
       console.error("Erro ao criar perfil:", profileError);
-      // Não impede o processo principal
     }
 
     // PASSO 5: Criar assinatura trial
@@ -213,7 +200,7 @@ async function createTrialAccount() {
       console.warn("Aviso na assinatura:", subscriptionError);
     }
 
-    // PASSO 6: Criar company_profile básico
+    // PASSO 6: Criar company_profile
     const { error: companyError } = await supabase
       .from("company_profiles")
       .upsert({
@@ -237,16 +224,7 @@ async function createTrialAccount() {
     showSuccessModal(userData, trialEnd);
   } catch (error) {
     console.error("❌ Erro ao criar conta:", error);
-
-    // Mensagem amigável para o usuário
-    let errorMessage = error.message;
-    if (error.message.includes("duplicate key")) {
-      errorMessage = "Este email ou CPF/CNPJ já está cadastrado.";
-    } else if (error.message.includes("network")) {
-      errorMessage = "Problema de conexão. Verifique sua internet.";
-    }
-
-    alert(`Erro: ${errorMessage}`);
+    alert(`Erro: ${error.message}`);
   } finally {
     // Reativar botão
     btnCadastrar.disabled = false;
@@ -334,14 +312,10 @@ function showSuccessModal(userData, trialEnd) {
               </div>
             </div>
             
-            <div class="alert alert-warning">
-              <h6><i class="bi bi-envelope-exclamation me-2"></i>Importante: Confirme seu email</h6>
+            <div class="alert alert-success">
+              <h6><i class="bi bi-check-circle me-2"></i>✅ Email confirmado automaticamente!</h6>
               <p class="mb-0">
-                Enviamos um email de confirmação para <strong>${
-                  userData.email
-                }</strong>.
-                <br>
-                <small class="text-muted">Verifique sua caixa de entrada e spam.</small>
+                Sua conta já está ativa e pronta para uso.
               </p>
             </div>
             
