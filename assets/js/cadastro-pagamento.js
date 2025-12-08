@@ -134,7 +134,7 @@ async function createTrialAccount() {
       options: {
         data: {
           full_name: userData.nome,
-          cpf_cnpj: userData.cpfCnpj,
+          cpf_cnpj: userData.cpf_Cnpj,
           phone: userData.telefone,
         },
       },
