@@ -1,481 +1,279 @@
-// assets/js/cadastro-pagamento.js - VERSÃO CORRIGIDA COM PLANO TRIAL ID 0
-
+// assets/js/cadastro-pagamento.js - VERSÃO SIMPLIFICADA
 import { supabase } from "./supabaseClient.js";
 
-let userData = {};
-
-// Inicialização
 document.addEventListener("DOMContentLoaded", function () {
   console.log("🚀 Página de cadastro Trial carregada");
 
-  try {
-    // Configurar toggle de senha
-    const togglePassword = document.querySelector(".toggle-password");
-    if (togglePassword) {
-      togglePassword.addEventListener("click", function () {
-        const passwordInput = document.getElementById("senha");
-        const icon = this.querySelector("i");
+  // Toggle password visibility
+  const togglePassword = document.querySelector(".toggle-password");
+  if (togglePassword) {
+    togglePassword.addEventListener("click", function () {
+      const passwordInput = document.getElementById("senha");
+      const icon = this.querySelector("i");
 
-        if (passwordInput.type === "password") {
-          passwordInput.type = "text";
-          icon.classList.remove("bi-eye");
-          icon.classList.add("bi-eye-slash");
-        } else {
-          passwordInput.type = "password";
-          icon.classList.remove("bi-eye-slash");
-          icon.classList.add("bi-eye");
-        }
-      });
-    }
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        icon.classList.replace("bi-eye", "bi-eye-slash");
+      } else {
+        passwordInput.type = "password";
+        icon.classList.replace("bi-eye-slash", "bi-eye");
+      }
+    });
+  }
 
-    // Verificar força da senha
-    const passwordInput = document.getElementById("senha");
-    if (passwordInput) {
-      passwordInput.addEventListener("input", function () {
-        checkPasswordStrength(this.value);
-      });
-    }
-
-    // Form submission
-    const signupForm = document.getElementById("signup-form");
-    if (signupForm) {
-      signupForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        validateAndCreateTrial();
-      });
-    }
-
-    // Botão de cadastro
-    const cadastrarBtn = document.getElementById("btn-cadastrar");
-    if (cadastrarBtn) {
-      cadastrarBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        validateAndCreateTrial();
-      });
-    }
-
-    console.log("✅ Inicialização concluída com sucesso!");
-  } catch (error) {
-    console.error("❌ Erro na inicialização:", error);
+  // Form submission
+  const signupForm = document.getElementById("signup-form");
+  if (signupForm) {
+    signupForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      await createTrialAccount();
+    });
   }
 });
 
-// Função para verificar força da senha
-function checkPasswordStrength(password) {
-  let strength = 0;
-  let tips = [];
-
-  if (password.length >= 8) strength++;
-  else tips.push("Use pelo menos 8 caracteres.");
-
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-  else tips.push("Use letras maiúsculas e minúsculas.");
-
-  if (/\d/.test(password)) strength++;
-  else tips.push("Inclua pelo menos um número.");
-
-  if (/[^a-zA-Z0-9]/.test(password)) strength++;
-  else tips.push("Adicione um caractere especial (!@#$%^&*).");
-
-  // Atualizar interface se existir
-  const strengthBar = document.getElementById("passwordStrength");
-  const tipsElement = document.getElementById("passwordTips");
-
-  if (strengthBar) {
-    strengthBar.className = "password-strength strength-" + strength;
-  }
-
-  if (tipsElement) {
-    if (strength < 4 && password.length > 0) {
-      tipsElement.textContent = "Dica: " + tips.join(" ");
-      tipsElement.className = "text-warning d-block mt-1";
-    } else if (password.length > 0) {
-      tipsElement.textContent = "Senha forte!";
-      tipsElement.className = "text-success d-block mt-1";
-    } else {
-      tipsElement.textContent = "";
-    }
-  }
-}
-
-// Função para validar formato de email
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// Função para validar CPF/CNPJ
-function isValidCpfCnpj(cpfCnpj) {
-  const cleanCpfCnpj = cpfCnpj.replace(/\D/g, "");
-
-  // Validação básica de tamanho
-  if (cleanCpfCnpj.length === 11) {
-    return validateCPF(cleanCpfCnpj);
-  } else if (cleanCpfCnpj.length === 14) {
-    return validateCNPJ(cleanCpfCnpj);
-  }
-
-  return false;
-}
-
-// Validação de CPF
-function validateCPF(cpf) {
-  if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-
-  let sum = 0;
-  for (let i = 0; i < 9; i++) {
-    sum += parseInt(cpf.charAt(i)) * (10 - i);
-  }
-  let remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cpf.charAt(9))) return false;
-
-  sum = 0;
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(cpf.charAt(i)) * (11 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-
-  return remainder === parseInt(cpf.charAt(10));
-}
-
-// Validação básica de CNPJ (apenas formato)
-function validateCNPJ(cnpj) {
-  return cnpj.length === 14 && !/^(\d)\1+$/.test(cnpj);
-}
-
-// Função principal para criar trial
-async function validateAndCreateTrial() {
-  const form = document.getElementById("signup-form");
-  const email = document.getElementById("email").value.trim();
+// Validação simplificada
+function validateForm() {
   const nome = document.getElementById("nome").value.trim();
-  const cpfCnpj = document.getElementById("cpf_cnpj").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const cpf_cnpj = document.getElementById("cpf_cnpj").value.trim();
   const senha = document.getElementById("senha").value;
-  const telefone = document.getElementById("telefone").value.trim();
   const terms = document.getElementById("terms").checked;
 
-  // Limpar validações anteriores
-  document.getElementById("nome").classList.remove("is-invalid");
-  document.getElementById("email").classList.remove("is-invalid");
-  document.getElementById("cpf_cnpj").classList.remove("is-invalid");
-  document.getElementById("senha").classList.remove("is-invalid");
+  // Reset validation
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
 
-  // Validar campos obrigatórios
+  let isValid = true;
+
   if (!nome) {
-    alert("Por favor, informe seu nome completo.");
     document.getElementById("nome").classList.add("is-invalid");
-    return;
+    isValid = false;
   }
 
-  if (!isValidEmail(email)) {
-    alert("Por favor, insira um endereço de email válido.");
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     document.getElementById("email").classList.add("is-invalid");
-    return;
+    isValid = false;
   }
 
-  if (!isValidCpfCnpj(cpfCnpj)) {
-    alert("Por favor, insira um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.");
+  const cleanCpfCnpj = cpf_cnpj.replace(/\D/g, "");
+  if (
+    !cleanCpfCnpj ||
+    (cleanCpfCnpj.length !== 11 && cleanCpfCnpj.length !== 14)
+  ) {
     document.getElementById("cpf_cnpj").classList.add("is-invalid");
-    return;
+    isValid = false;
   }
 
   if (!senha || senha.length < 8) {
-    alert("A senha deve ter pelo menos 8 caracteres.");
     document.getElementById("senha").classList.add("is-invalid");
-    return;
+    isValid = false;
   }
 
   if (!terms) {
-    alert("Você deve aceitar os termos de serviço para continuar.");
-    return;
+    alert("Você precisa aceitar os termos de serviço.");
+    isValid = false;
   }
 
-  // Salvar dados do usuário
-  userData = {
-    email: email,
-    password: senha,
-    fullName: nome,
-    cpfCnpj: cpfCnpj.replace(/\D/g, ""),
-    phone: telefone,
-  };
-
-  console.log("📝 Dados do usuário capturados:", {
-    ...userData,
-    password: "***",
-  });
-
-  // Criar conta trial
-  await createTrialAccount();
+  return isValid;
 }
 
-// Criar conta trial
+// Função principal de criação da conta
 async function createTrialAccount() {
+  if (!validateForm()) return;
+
   const btnCadastrar = document.getElementById("btn-cadastrar");
-  const submitText = btnCadastrar?.querySelector(".submit-text");
+  const submitText = btnCadastrar.querySelector(".submit-text");
   const spinner = document.getElementById("spinner");
 
   // Desativar botão e mostrar spinner
-  if (btnCadastrar) btnCadastrar.disabled = true;
-  if (submitText) submitText.classList.add("d-none");
-  if (spinner) spinner.classList.remove("d-none");
+  btnCadastrar.disabled = true;
+  submitText.classList.add("d-none");
+  spinner.classList.remove("d-none");
 
   try {
-    console.log("🎯 Criando conta Trial...");
+    // Coletar dados
+    const userData = {
+      nome: document.getElementById("nome").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      cpf_cnpj: document.getElementById("cpf_cnpj").value.replace(/\D/g, ""),
+      senha: document.getElementById("senha").value,
+      telefone: document.getElementById("telefone").value.trim() || null,
+    };
 
-    // 1. Verificar se email já existe
-    const { data: emailCheck, error: emailError } = await supabase
+    console.log("📝 Criando conta trial para:", userData.email);
+
+    // PASSO 1: Verificar se email já existe
+    const { data: existingEmail } = await supabase
       .from("user_profiles")
       .select("email")
       .eq("email", userData.email)
-      .maybeSingle();
+      .single();
 
-    if (emailError) throw emailError;
-    if (emailCheck) throw new Error("Este email já está cadastrado.");
+    if (existingEmail) {
+      throw new Error(
+        "Este email já está cadastrado. Faça login ou use outro email."
+      );
+    }
 
-    // 2. Verificar se CPF/CNPJ já existe
-    const { data: existingUser, error: lookupError } = await supabase
+    // PASSO 2: Verificar se CPF/CNPJ já existe
+    const { data: existingDoc } = await supabase
       .from("user_profiles")
       .select("cpf_cnpj")
-      .eq("cpf_cnpj", userData.cpfCnpj)
-      .maybeSingle();
+      .eq("cpf_cnpj", userData.cpf_cnpj)
+      .single();
 
-    if (lookupError) throw lookupError;
-    if (existingUser) throw new Error("Este CPF/CNPJ já está cadastrado");
+    if (existingDoc) {
+      throw new Error("Este CPF/CNPJ já está cadastrado.");
+    }
 
-    // 3. Criar usuário no Supabase Auth
-    console.log("Criando usuário no Auth...");
-    const { data: authResult, error: signUpError } = await supabase.auth.signUp(
-      {
-        email: userData.email,
-        password: userData.password,
-        options: {
-          data: {
-            full_name: userData.fullName,
-            cpf_cnpj: userData.cpfCnpj,
-            phone: userData.phone,
-          },
-          emailRedirectTo: "https://sarm-tech.netlify.app/confirm.html",
+    // PASSO 3: Criar usuário no Supabase Auth
+    console.log("🔐 Criando usuário no Auth...");
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: userData.email,
+      password: userData.senha,
+      options: {
+        data: {
+          full_name: userData.nome,
+          cpf_cnpj: userData.cpf_cnpj,
+          phone: userData.telefone,
         },
-      }
-    );
+        // Com PKCE, não precisa de redirect URL
+      },
+    });
 
-    if (signUpError) {
-      console.error("Erro no Auth:", signUpError);
-
-      // Tratar erros específicos do Auth
-      if (signUpError.message.includes("Email rate limit exceeded")) {
-        throw new Error(
-          "Muitas tentativas. Aguarde alguns minutos e tente novamente."
-        );
-      } else if (signUpError.message.includes("Invalid email")) {
-        throw new Error("Email inválido. Verifique o endereço informado.");
-      } else if (signUpError.message.includes("Password")) {
-        throw new Error("A senha não atende aos requisitos de segurança.");
-      } else {
-        throw new Error(`Erro de autenticação: ${signUpError.message}`);
+    if (authError) {
+      console.error("Erro no Auth:", authError);
+      if (authError.message.includes("Email rate limit")) {
+        throw new Error("Muitas tentativas. Aguarde alguns minutos.");
       }
+      throw new Error(`Erro de autenticação: ${authError.message}`);
     }
 
-    if (!authResult.user) {
-      throw new Error("Não foi possível criar o usuário. Tente novamente.");
+    if (!authData.user) {
+      throw new Error("Não foi possível criar o usuário.");
     }
 
-    const userId = authResult.user.id;
+    const userId = authData.user.id;
     console.log("✅ Usuário Auth criado:", userId);
 
-    // 4. Criar perfil do usuário com plano Trial (ID 0)
+    // PASSO 4: Criar perfil do usuário
     const { error: profileError } = await supabase
       .from("user_profiles")
       .upsert({
         id: userId,
         email: userData.email,
-        full_name: userData.fullName,
-        cpf_cnpj: userData.cpfCnpj,
-        phone: userData.phone,
-        plan_id: 0, // Plano Trial ID 0
-        subscription_status: "trial",
+        full_name: userData.nome,
+        cpf_cnpj: userData.cpf_cnpj,
+        phone: userData.telefone,
+        plan_id: 0, // Plano Trial
+        subscription_status: "trialing",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
 
     if (profileError) {
-      console.error("Erro ao criar perfil:", profileError);
+      console.error("Erro no perfil:", profileError);
+      // Não impede o processo, apenas loga o erro
+    }
 
-      // Se der erro no perfil, tentar criar company_profile também
-      await supabase.from("company_profiles").upsert({
+    // PASSO 5: Criar assinatura trial
+    const trialStart = new Date();
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 30);
+
+    const { error: subscriptionError } = await supabase
+      .from("subscriptions")
+      .insert({
         user_id: userId,
-        name: userData.fullName,
-        email: userData.email,
-        phone: userData.phone,
+        plan_id: 0,
+        status: "trialing",
+        payment_method: "trial",
+        current_period_start: trialStart.toISOString(),
+        current_period_end: trialEnd.toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
 
-      throw new Error("Perfil criado parcialmente. Você pode fazer login.");
+    if (subscriptionError) {
+      console.warn("Aviso na assinatura:", subscriptionError);
+      // Não impede o processo
     }
 
-    // 5. Criar company_profile
+    // PASSO 6: Criar company_profile básico
     const { error: companyError } = await supabase
       .from("company_profiles")
       .upsert({
         user_id: userId,
-        name: userData.fullName + " - Empresa",
+        name: userData.nome + " - Empresa",
         email: userData.email,
-        phone: userData.phone,
+        phone: userData.telefone,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
 
     if (companyError) {
-      console.warn("Aviso ao criar company_profile:", companyError);
-      // Não impede a criação da conta
+      console.warn("Aviso no company_profile:", companyError);
     }
 
-    // 6. Criar assinatura trial
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 30); // 30 dias de trial
+    // SUCESSO!
+    console.log("🎉 Conta trial criada com sucesso!");
 
-    const { data: subscription, error: subError } = await supabase
-      .from("subscriptions")
-      .insert({
-        user_id: userId,
-        plan_id: 0, // Plano Trial ID 0
-        status: "trialing",
-        payment_method: "trial",
-        current_period_start: new Date().toISOString(),
-        current_period_end: trialEnd.toISOString(),
-        is_test: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
-    if (subError) {
-      console.warn("Aviso ao criar assinatura:", subError);
-      // Não impede a criação da conta principal
-    }
-
-    console.log("✅ Conta Trial criada com sucesso!");
-
-    // 7. Sucesso - mostrar mensagem detalhada
-    const successMessage = `
-        🎉 <strong>Conta criada com sucesso!</strong>
-
-      <div style="text-align: left; margin: 15px 0;">
-        <p>✅ <strong>Seu Trial de 15 dias foi ativado</strong></p>
-        <p>📧 <strong>Email:</strong> ${userData.email}</p>
-        <p>👤 <strong>Nome:</strong> ${userData.fullName}</p>
-        <p>📅 <strong>Trial válido até:</strong> ${trialEnd.toLocaleDateString(
-          "pt-BR"
-        )}</p>
-        <p>🚀 <strong>Você já pode fazer login!</strong></p>
-      </div>
-
-      <p><strong>Faça login agora e comece a usar o sistema.</strong></p>
-    `;
-
-    // Criar modal de sucesso
-    showSuccessModal(successMessage);
+    // Mostrar modal de sucesso
+    showSuccessModal(userData, trialEnd);
   } catch (error) {
-    console.error("❌ Erro ao criar conta trial:", error);
-
-    let errorMessage = "Erro ao criar conta: ";
-
-    if (error.message.includes("já está cadastrado")) {
-      errorMessage = error.message;
-    } else if (error.message.includes("Email")) {
-      errorMessage += "Verifique o email informado.";
-    } else if (error.message.includes("Password")) {
-      errorMessage += "A senha não atende aos requisitos de segurança.";
-    } else if (error.message.includes("rate limit")) {
-      errorMessage = "Muitas tentativas. Aguarde alguns minutos.";
-    } else {
-      errorMessage += error.message;
-    }
-
-    alert(`❌ ${errorMessage}`);
+    console.error("❌ Erro ao criar conta:", error);
+    alert(`Erro: ${error.message}`);
   } finally {
     // Reativar botão
-    if (btnCadastrar) btnCadastrar.disabled = false;
-    if (submitText) submitText.classList.remove("d-none");
-    if (spinner) spinner.classList.add("d-none");
+    btnCadastrar.disabled = false;
+    submitText.classList.remove("d-none");
+    spinner.classList.add("d-none");
   }
 }
 
-async function processTokenFromURL() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
-  const type = urlParams.get("type");
-
-  if (token && type === "signup") {
-    console.log("🔄 Processando token da URL...", token);
-
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        token: token,
-        type: "signup",
-      });
-
-      if (error) {
-        console.error("❌ Erro ao verificar token:", error);
-      } else {
-        console.log("✅ Token verificado com sucesso!");
-        // O usuário agora está confirmado
-        showSuccess();
-      }
-    } catch (error) {
-      console.error("❌ Erro no processamento do token:", error);
-    }
-  }
-}
-
-// E modifique a função processConfirmation:
-async function processConfirmation() {
-  try {
-    console.log("🔍 Iniciando processamento de confirmação...");
-
-    // Primeiro tenta processar token da URL
-    await processTokenFromURL();
-
-    // Depois verifica a sessão normalmente
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
-
-    if (session?.user) {
-      console.log("✅ Sessão ativa detectada:", session.user.email);
-      showSuccess();
-    } else {
-      console.log("ℹ️ Aguardando confirmação...");
-      // Mantém mostrando "Processando..." até a confirmação
-    }
-  } catch (error) {
-    console.error("❌ Erro no processamento:", error);
-    showError(error.message);
-  }
-}
-
-// Mostrar modal de sucesso
-function showSuccessModal(message) {
-  // Criar modal dinamicamente
+// Modal de sucesso
+function showSuccessModal(userData, trialEnd) {
   const modalHtml = `
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-success text-white">
-            <h5 class="modal-title" id="successModalLabel">
+            <h5 class="modal-title">
               <i class="bi bi-check-circle-fill me-2"></i>
               Conta Criada com Sucesso!
             </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            ${message}
+            <div class="text-center mb-4">
+              <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="text-center mb-3">🎉 Parabéns!</h4>
+            <p class="text-center">Sua conta trial foi criada com sucesso.</p>
+            
+            <div class="alert alert-info">
+              <strong>Detalhes da sua conta:</strong>
+              <ul class="mb-0 mt-2">
+                <li><strong>Email:</strong> ${userData.email}</li>
+                <li><strong>Nome:</strong> ${userData.nome}</li>
+                <li><strong>Trial válido até:</strong> ${trialEnd.toLocaleDateString(
+                  "pt-BR"
+                )}</li>
+                <li><strong>Dias restantes:</strong> 30 dias</li>
+              </ul>
+            </div>
+            
+            <div class="alert alert-warning">
+              <i class="bi bi-envelope me-2"></i>
+              <strong>Verifique seu email!</strong><br>
+              Enviamos um link de confirmação para ${userData.email}
+            </div>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="window.location.href='https://sarmtech.netlify.app/login/login.html'">
+              <i class="bi bi-box-arrow-in-right me-2"></i>
+              Ir para o Login
+            </button>
           </div>
         </div>
       </div>
@@ -483,67 +281,24 @@ function showSuccessModal(message) {
   `;
 
   // Adicionar modal ao body
-  document.body.insertAdjacentHTML("beforeend", modalHtml);
+  const modalContainer = document.createElement("div");
+  modalContainer.id = "successModalContainer";
+  modalContainer.innerHTML = modalHtml;
+  document.body.appendChild(modalContainer);
 
-  // Mostrar modal
-  const successModal = new bootstrap.Modal(
-    document.getElementById("successModal")
-  );
-  successModal.show();
+  // Fechar modal ao clicar fora
+  modalContainer.addEventListener("click", function (e) {
+    if (e.target === this) {
+      this.remove();
+      window.location.href = "https://sarmtech.netlify.app/login/login.html";
+    }
+  });
 
-  // Redirecionar automaticamente após 10 segundos
+  // Redirecionar após 15 segundos
   setTimeout(() => {
-    window.location.href = "https://sarmtech.netlify.app/";
-  }, 10000);
+    window.location.href = "https://sarmtech.netlify.app/login/login.html";
+  }, 15000);
 }
 
-// Função para migrar trial para plano pago (para usar depois)
-async function migrateTrialToPaid(userId, targetPlanId, paymentMethod) {
-  try {
-    console.log(`🔄 Migrando usuário ${userId} para plano ${targetPlanId}`);
-
-    // Calcular período
-    const periodEnd = new Date();
-    periodEnd.setMonth(periodEnd.getMonth() + 1); // Mensal por padrão
-
-    // Atualizar assinatura
-    const { error: updateError } = await supabase
-      .from("subscriptions")
-      .update({
-        plan_id: targetPlanId,
-        status: "active",
-        payment_method: paymentMethod,
-        current_period_start: new Date().toISOString(),
-        current_period_end: periodEnd.toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", userId);
-
-    if (updateError) throw updateError;
-
-    // Atualizar perfil do usuário
-    const { error: profileError } = await supabase
-      .from("user_profiles")
-      .update({
-        plan_id: targetPlanId,
-        subscription_status: "active",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", userId);
-
-    if (profileError) throw profileError;
-
-    console.log("✅ Migração concluída com sucesso");
-    return { success: true };
-  } catch (error) {
-    console.error("❌ Erro na migração:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-// Exportar funções para uso global
-window.supabase = supabase;
-window.userData = userData;
-window.migrateTrialToPaid = migrateTrialToPaid;
-
-console.log("✅ cadastro-pagamento.js carregado com sucesso!");
+// Adicionar ao window para acesso global
+window.createTrialAccount = createTrialAccount;
