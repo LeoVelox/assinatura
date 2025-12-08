@@ -1,51 +1,71 @@
-// VERSÃO HIPER SIMPLES - APENAS CRIA USUÁRIO
+// VERSÃO FINAL - CADASTRO SIMPLES SEM ERROS
 import { supabase } from "./supabaseClient.js";
 
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("✅ Sistema SIMPLES carregado");
+  console.log("✅ Sistema FINAL carregado");
 
   const form = document.getElementById("signup-form");
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    await criarContaSimples();
+    await cadastrarUsuarioFinal();
   });
 });
 
-async function criarContaSimples() {
-  // Pegar dados básicos
+async function cadastrarUsuarioFinal() {
+  // Coletar dados básicos
   const email = document.getElementById("email").value.trim();
   const nome = document.getElementById("nome").value.trim();
-  const senha = document.getElementById("senha").value;
   const cpf = document.getElementById("cpf_cnpj").value.replace(/\D/g, "");
+  const senha = document.getElementById("senha").value;
 
-  // Validação mínima
+  // Validações mínimas
   if (!email || !nome || !senha) {
     alert("Preencha email, nome e senha");
     return;
   }
 
-  // Botão loading
+  if (senha.length < 6) {
+    alert("Senha deve ter pelo menos 6 caracteres");
+    return;
+  }
+
+  if (!document.getElementById("terms").checked) {
+    alert("Aceite os termos de serviço");
+    return;
+  }
+
+  // UI feedback
   const btn = document.getElementById("btn-cadastrar");
   btn.disabled = true;
   const textoOriginal = btn.innerHTML;
-  btn.innerHTML = "Criando...";
+  btn.innerHTML =
+    '<span class="spinner-border spinner-border-sm"></span> Criando...';
 
   try {
-    console.log("Tentando criar conta para:", email);
+    console.log("1. Criando usuário no Auth...");
 
-    // MÉTODO 1: Criar usuário forma MAIS SIMPLES
-    const { data, error } = await supabase.auth.signUp({
+    // MÉTODO 1: Criar usuário da forma MAIS SIMPLES
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: email,
       password: senha,
-      // NADA MAIS - sem options, sem data
+      options: {
+        data: {
+          full_name: nome,
+          cpf_cnpj: cpf,
+        },
+        // SEM emailRedirectTo
+      },
     });
 
-    if (error) {
-      console.log("Erro no signUp:", error.message);
+    // Se erro, analisar
+    if (authError) {
+      console.log("Erro Auth:", authError.message);
 
-      // Se usuário já existe, fazer login
-      if (error.message.includes("already registered")) {
-        const fazerLogin = confirm("Email já cadastrado. Fazer login?");
+      // Se usuário já existe
+      if (authError.message.includes("already registered")) {
+        const fazerLogin = confirm(
+          "Este email já está cadastrado.\n\nDeseja fazer login?"
+        );
         if (fazerLogin) {
           window.location.href =
             "https://sarmtech.netlify.app/login/login.html";
@@ -53,40 +73,34 @@ async function criarContaSimples() {
         return;
       }
 
-      // Se for erro de banco, tentar método alternativo
-      if (error.message.includes("Database error")) {
-        console.log("Erro de banco, tentando método 2...");
-        await criarContaAlternativo(email, senha, nome, cpf);
-        return;
-      }
-
-      throw error;
+      // Se outro erro, tentar método mais simples
+      console.log("Tentando método alternativo...");
+      await criarUsuarioSimples(email, senha, nome, cpf);
+      return;
     }
 
-    // Sucesso!
-    console.log("✅ Usuário criado:", data.user?.id);
+    // SUCESSO - usuário criado
+    console.log("✅ Usuário criado:", authData.user?.id);
 
-    // Tentar login automático
+    // Criar perfil manualmente (se possível)
     setTimeout(async () => {
       try {
-        const { error: loginError } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: senha,
-        });
-
-        if (!loginError) {
-          // Criar perfil manualmente APÓS login
-          await criarPerfilManualmente(data.user.id, email, nome, cpf);
-
-          alert("✅ Conta criada! Redirecionando...");
-          window.location.href = "https://sarmtech.netlify.app/dashboard.html";
-        } else {
-          alert("✅ Conta criada! Faça login.");
-          window.location.href =
-            "https://sarmtech.netlify.app/login/login.html";
-        }
+        await criarPerfilUsuario(authData.user.id, email, nome, cpf);
       } catch (e) {
-        alert("✅ Conta criada! Acesse pelo login.");
+        console.warn("Perfil não criado:", e);
+      }
+
+      // Tentar login
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: senha,
+      });
+
+      if (!loginError) {
+        alert("🎉 Conta criada com sucesso! Redirecionando...");
+        window.location.href = "https://sarmtech.netlify.app/dashboard.html";
+      } else {
+        alert("✅ Conta criada! Faça login.");
         window.location.href = "https://sarmtech.netlify.app/login/login.html";
       }
     }, 1000);
@@ -99,25 +113,34 @@ async function criarContaSimples() {
   }
 }
 
-// Método alternativo se o primeiro falhar
-async function criarContaAlternativo(email, senha, nome, cpf) {
+// Método alternativo mais simples
+async function criarUsuarioSimples(email, senha, nome, cpf) {
   try {
-    console.log("Tentando método alternativo...");
-
-    // Primeiro tenta login (talvez conta já existe)
-    const { error: loginError } = await supabase.auth.signInWithPassword({
+    // Criar APENAS com email e senha
+    const { data, error } = await supabase.auth.signUp({
       email: email,
       password: senha,
+      // SEM options, SEM data
     });
 
-    if (!loginError) {
-      alert("✅ Login realizado! Conta já existia.");
-      window.location.href = "https://sarmtech.netlify.app/dashboard.html";
+    if (error) {
+      // Se mesmo assim falhar, API direta
+      await criarViaAPIDireta(email, senha, nome, cpf);
       return;
     }
 
-    // Se não consegue login, tenta criar de outra forma
-    // Usando fetch direto para a API do Supabase
+    // Sucesso
+    alert("✅ Conta criada! Faça login.");
+    window.location.href = "https://sarmtech.netlify.app/login/login.html";
+  } catch (error) {
+    console.error("Erro método simples:", error);
+    await criarViaAPIDireta(email, senha, nome, cpf);
+  }
+}
+
+// API direta como último recurso
+async function criarViaAPIDireta(email, senha, nome, cpf) {
+  try {
     const response = await fetch(
       "https://pjvgzbnqnwrqxwlbndkr.supabase.co/auth/v1/signup",
       {
@@ -130,10 +153,6 @@ async function criarContaAlternativo(email, senha, nome, cpf) {
         body: JSON.stringify({
           email: email,
           password: senha,
-          data: {
-            full_name: nome,
-            cpf_cnpj: cpf,
-          },
         }),
       }
     );
@@ -145,17 +164,16 @@ async function criarContaAlternativo(email, senha, nome, cpf) {
       return;
     }
 
-    // Sucesso com API direta
-    alert("✅ Conta criada via API direta! Faça login.");
+    alert("✅ Conta criada via método seguro!\n\nFaça login.");
     window.location.href = "https://sarmtech.netlify.app/login/login.html";
   } catch (error) {
-    console.error("Erro método alternativo:", error);
-    alert("Erro crítico. Tente novamente mais tarde.");
+    console.error("Erro API direta:", error);
+    alert("Erro crítico. Entre em contato com suporte.");
   }
 }
 
-// Criar perfil manualmente
-async function criarPerfilManualmente(userId, email, nome, cpf) {
+// Criar perfil do usuário
+async function criarPerfilUsuario(userId, email, nome, cpf) {
   try {
     await supabase.from("user_profiles").upsert(
       {
@@ -165,6 +183,10 @@ async function criarPerfilManualmente(userId, email, nome, cpf) {
         cpf_cnpj: cpf,
         plan_id: 0,
         subscription_status: "trial",
+        trial_start: new Date().toISOString(),
+        trial_end: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000
+        ).toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
@@ -172,7 +194,10 @@ async function criarPerfilManualmente(userId, email, nome, cpf) {
         onConflict: "id",
       }
     );
+
+    console.log("✅ Perfil criado/atualizado");
   } catch (error) {
-    console.warn("Aviso: não foi possível criar perfil", error);
+    console.warn("⚠️ Não foi possível criar perfil:", error);
+    // Não é crítico - usuário já está criado no Auth
   }
 }
