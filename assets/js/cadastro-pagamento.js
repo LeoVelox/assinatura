@@ -142,7 +142,7 @@ async function createTrialAccount() {
           cpf_cnpj: userData.cpf_cnpj,
           phone: userData.telefone,
         },
-        //emailRedirectTo: "https://sarmtech.netlify.app/confirm.html",
+        emailRedirectTo: "https://sarmtech.netlify.app/confirm.html",
       },
     });
 
@@ -294,6 +294,9 @@ async function autoConfirmEmail(userId, email) {
   }
 }
 
+// Chame a função DEPOIS de authData.user (linha ~169)
+await autoConfirmEmail(userId, userData.email);
+
 // Modal de sucesso (SEM redirecionamento automático)
 function showSuccessModal(userData, trialEnd) {
   const modalHtml = `
@@ -331,10 +334,14 @@ function showSuccessModal(userData, trialEnd) {
               </div>
             </div>
             
-            <div class="alert alert-success">
-              <h6><i class="bi bi-check-circle me-2"></i>✅ Email confirmado automaticamente!</h6>
+            <div class="alert alert-warning">
+              <h6><i class="bi bi-envelope-exclamation me-2"></i>Importante: Confirme seu email</h6>
               <p class="mb-0">
-                Sua conta já está ativa e pronta para uso.
+                Enviamos um email de confirmação para <strong>${
+                  userData.email
+                }</strong>.
+                <br>
+                <small class="text-muted">Verifique sua caixa de entrada e spam.</small>
               </p>
             </div>
             
