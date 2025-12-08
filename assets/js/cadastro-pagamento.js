@@ -258,39 +258,46 @@ async function safeUpsertUserProfile(userId, userData) {
   }
 }
 
-// Modal de sucesso — sem redirecionamento automático
+// Modal de sucesso — sem e-mail de confirmação
 function showSuccessModal(userData, trialEnd) {
   // remover modal anterior se existir
   const existing = document.getElementById("successModalContainer");
   if (existing) existing.remove();
 
   const modalHtml = `
-    <div class="modal fade show d-block" id="successModal" tabindex="-1" style="background: rgba(0,0,0,0.5); position: fixed; inset: 0; z-index: 1050;">
+    <div class="modal fade show d-block" id="successModal" tabindex="-1" style="background: rgba(0,0,0,0.55); position: fixed; inset: 0; z-index: 1050;">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg">
           <div class="modal-header bg-success text-white">
-            <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i>Conta Criada com Sucesso!</h5>
+            <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i>Conta criada e ativada!</h5>
             <button type="button" class="btn-close btn-close-white" onclick="closeSuccessModal()"></button>
           </div>
+
           <div class="modal-body">
             <div class="text-center mb-3">
-              <i class="bi bi-check-circle" style="font-size: 3.5rem; color: #198754;"></i>
+              <i class="bi bi-person-check-fill" style="font-size: 3.5rem; color: #198754;"></i>
             </div>
-            <p class="text-center">Sua conta trial de 30 dias foi criada com sucesso.</p>
-            <ul class="list-unstyled">
+            <p class="text-center mb-3">
+              Sua conta trial foi ativada com sucesso!<br>
+              Agora você já pode acessar o sistema imediatamente.
+            </p>
+
+            <ul class="list-unstyled mb-3">
               <li><strong>Nome:</strong> ${userData.nome}</li>
               <li><strong>Email:</strong> ${userData.email}</li>
-              <li><strong>Trial até:</strong> ${trialEnd.toLocaleDateString(
+              <li><strong>Trial válido até:</strong> ${trialEnd.toLocaleDateString(
                 "pt-BR"
               )}</li>
             </ul>
-            <div class="alert alert-info mt-3">
-              <small>Verifique sua caixa de entrada (caso precise do email) e use o login para acessar o sistema.</small>
+
+            <div class="alert alert-success mt-2">
+              <small>Bem-vindo(a)! Aproveite 30 dias de acesso completo aos recursos da plataforma.</small>
             </div>
           </div>
+
           <div class="modal-footer">
             <button class="btn btn-outline-secondary" onclick="closeSuccessModal()">Fechar</button>
-            <button class="btn btn-primary" onclick="goToLogin()">Ir para o Login</button>
+            <button class="btn btn-primary" onclick="goToLogin()">Acessar o Sistema</button>
           </div>
         </div>
       </div>
