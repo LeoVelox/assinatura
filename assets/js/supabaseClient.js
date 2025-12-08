@@ -1,4 +1,4 @@
-// Configuração otimizada SEM confirmação de email
+// assets/js/supabaseClient.js - VERSÃO CORRIGIDA
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabaseUrl = "https://pjvgzbnqnwrqxwlbndkr.supabase.co";
@@ -11,6 +11,5 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    // Não requer confirmação de email
   },
 });
