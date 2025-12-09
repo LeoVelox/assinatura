@@ -1,9 +1,11 @@
-// assets/js/cadastro-pagamento.js
-// Versão revisada — CONFIRMAÇÃO AUTOMÁTICA, sem redirect_to que causava "Database error updating user"
+// assets/js/cadastro-pagamento.js - VERSÃO CORRIGIDA
 import { supabase } from "./supabaseClient.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   console.log("🚀 Página de cadastro Trial carregada");
+
+  // Limpar qualquer sessão existente
+  supabase.auth.signOut().catch(() => {});
 
   // Toggle password visibility
   const togglePassword = document.querySelector(".toggle-password");
@@ -79,7 +81,7 @@ function validateForm() {
   return isValid;
 }
 
-// Função principal de criação da conta (fluxo: signUp sem redirect, upsert profile, criar assinatura, company_profile)
+// Função principal de criação da conta
 async function createTrialAccount() {
   if (!validateForm()) return;
 
@@ -103,7 +105,7 @@ async function createTrialAccount() {
 
     console.log("📝 Criando conta trial para:", userData.email);
 
-    // Verifica duplicidade em user_profiles (controle no seu domínio)
+    // Verifica duplicidade em user_profiles
     const { data: existingEmail } = await supabase
       .from("user_profiles")
       .select("id")
@@ -124,99 +126,121 @@ async function createTrialAccount() {
       throw new Error("Este CPF/CNPJ já está cadastrado.");
     }
 
-    // ======= SIGNUP =======
-    // IMPORTANT: NÃO enviar redirect/emailRedirectTo aqui para evitar conflito com confirmação automática.
-    console.log("🔐 Criando usuário no Auth (sem redirect)...");
+    // ======= SIGNUP com configuração específica =======
+    console.log("🔐 Criando usuário no Auth...");
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: userData.email,
-      password: userData.senha,
-      // sem options.emailRedirectTo para modo de confirmação automática
-    });
+    // TRY 1: Tenta criar usuário sem opções adicionais
+    let authData, authError;
+
+    try {
+      const result = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.senha,
+        options: {
+          data: {
+            full_name: userData.nome,
+            phone: userData.telefone,
+          },
+        },
+      });
+
+      authData = result.data;
+      authError = result.error;
+    } catch (signupError) {
+      console.error("Erro no signUp:", signupError);
+      // TRY 2: Tenta método alternativo se o primeiro falhar
+      const result = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.senha,
+      });
+
+      authData = result.data;
+      authError = result.error;
+    }
 
     if (authError) {
       console.error("❌ Erro no Auth:", authError);
-      // tratar mensagens comuns de forma amigável
-      if (authError.message?.toLowerCase()?.includes("already registered")) {
-        throw new Error("Este email já está cadastrado. Tente fazer login.");
-      }
+
+      // Tratamento específico de erros
       if (
-        authError.status === 429 ||
-        authError.message?.toLowerCase()?.includes("rate limit")
+        authError.message?.includes("already registered") ||
+        authError.message?.includes("already exists")
+      ) {
+        throw new Error(
+          "Este email já está cadastrado. Tente fazer login ou recuperar senha."
+        );
+      }
+
+      if (
+        authError.message?.includes("rate limit") ||
+        authError.status === 429
       ) {
         throw new Error(
           "Muitas tentativas. Aguarde alguns minutos e tente novamente."
         );
       }
+
+      if (authError.message?.includes("password")) {
+        throw new Error(
+          "A senha não atende aos requisitos de segurança. Use pelo menos 8 caracteres."
+        );
+      }
+
       throw new Error(
-        `Erro ao criar conta: ${authError.message || authError.toString()}`
+        `Erro ao criar conta: ${
+          authError.message || "Tente novamente mais tarde."
+        }`
       );
     }
 
     if (!authData || !authData.user) {
-      throw new Error(
-        "Erro inesperado ao criar usuário (sem dados retornados)."
-      );
+      throw new Error("Não foi possível criar o usuário. Tente novamente.");
     }
 
     const userId = authData.user.id;
     console.log("✅ Usuário Auth criado:", userId);
 
-    // ======= AUTO CONFIRM (apenas atualiza sua tabela de perfis)
-    // Não usamos service_role no frontend — apenas marcamos como confirmado em user_profiles
-    await safeUpsertUserProfile(userId, userData);
-
-    // ======= Criar assinatura trial
-    const trialStart = new Date();
-    const trialEnd = new Date(trialStart);
-    trialEnd.setDate(trialEnd.getDate() + 30);
-
-    const { error: subscriptionError } = await supabase
-      .from("subscriptions")
-      .insert({
-        user_id: userId,
-        plan_id: 0,
-        status: "trialing",
-        payment_method: "trial",
-        current_period_start: trialStart.toISOString(),
-        current_period_end: trialEnd.toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-
-    if (subscriptionError) {
-      console.warn(
-        "⚠️ Aviso: erro ao criar subscription (não crítico):",
-        subscriptionError
-      );
+    // ======= Criar perfil do usuário =======
+    const profileResult = await createUserProfile(userId, userData);
+    if (!profileResult.success) {
+      console.warn("⚠️ Aviso:", profileResult.message);
     }
 
-    // ======= Company profile
-    const { error: companyError } = await supabase
-      .from("company_profiles")
-      .upsert({
-        user_id: userId,
-        name: `${userData.nome} - Empresa`,
-        email: userData.email,
-        phone: userData.telefone,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+    // ======= Criar assinatura trial =======
+    const subscriptionResult = await createTrialSubscription(userId);
+    if (!subscriptionResult.success) {
+      console.warn("⚠️ Aviso:", subscriptionResult.message);
+    }
 
-    if (companyError) {
-      console.warn(
-        "⚠️ Aviso: erro ao criar company_profiles (não crítico):",
-        companyError
-      );
+    // ======= Criar company profile =======
+    const companyResult = await createCompanyProfile(userId, userData);
+    if (!companyResult.success) {
+      console.warn("⚠️ Aviso:", companyResult.message);
     }
 
     console.log("🎉 Conta criada com sucesso!");
-    showSuccessModal(userData, trialEnd);
+
+    // Fazer login automático
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: userData.email,
+      password: userData.senha,
+    });
+
+    if (signInError) {
+      console.warn("⚠️ Não foi possível fazer login automático:", signInError);
+      // Mostrar modal de sucesso com opção para login manual
+      showSuccessModalManualLogin(userData);
+    } else {
+      // Login bem-sucedido, redirecionar para dashboard
+      window.location.href = "https://sarmtech.netlify.app/dashboard.html";
+    }
   } catch (error) {
     console.error("❌ Erro ao criar conta:", error);
-    // mensagem amigável
-    const msg = error && error.message ? error.message : String(error);
-    alert(`Erro: ${msg}`);
+    alert(
+      `Erro: ${
+        error.message || "Não foi possível criar a conta. Tente novamente."
+      }`
+    );
   } finally {
     if (btnCadastrar) btnCadastrar.disabled = false;
     if (submitText) submitText.classList.remove("d-none");
@@ -224,12 +248,15 @@ async function createTrialAccount() {
   }
 }
 
-// Upsert do perfil do usuário de forma segura (marca email confirmado no perfil local)
-async function safeUpsertUserProfile(userId, userData) {
+// Função auxiliar para criar perfil do usuário
+async function createUserProfile(userId, userData) {
   try {
     const now = new Date().toISOString();
-    const payload = {
-      id: userId, // usar id do auth como pk
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 30);
+
+    const { error } = await supabase.from("user_profiles").upsert({
+      id: userId,
       email: userData.email,
       full_name: userData.nome,
       cpf_cnpj: userData.cpf_cnpj,
@@ -237,90 +264,120 @@ async function safeUpsertUserProfile(userId, userData) {
       plan_id: 0,
       subscription_status: "trialing",
       trial_start: now,
-      trial_end: new Date(
-        new Date(now).setDate(new Date(now).getDate() + 30)
-      ).toISOString(),
+      trial_end: trialEnd.toISOString(),
       trial_days_used: 0,
       created_at: now,
       updated_at: now,
-      email_confirmed_at: now, // marca como confirmado no perfil local
-    };
+      email_confirmed_at: now,
+    });
 
-    const { error } = await supabase.from("user_profiles").upsert(payload);
     if (error) {
-      // Se a inserção falhar por constraint do banco, apenas logamos — não interrompemos totalmente
-      console.warn("⚠️ Falha ao upsert em user_profiles:", error);
-    } else {
-      console.log("✅ user_profiles atualizado/criado com sucesso");
+      return {
+        success: false,
+        message: `Erro ao criar perfil: ${error.message}`,
+      };
     }
+
+    return { success: true, message: "Perfil criado com sucesso" };
   } catch (err) {
-    console.error("❌ Exceção no safeUpsertUserProfile:", err);
+    return {
+      success: false,
+      message: `Exceção ao criar perfil: ${err.message}`,
+    };
   }
 }
 
-// Modal de sucesso — sem e-mail de confirmação
-function showSuccessModal(userData, trialEnd) {
-  // remover modal anterior se existir
-  const existing = document.getElementById("successModalContainer");
-  if (existing) existing.remove();
+// Função auxiliar para criar assinatura trial
+async function createTrialSubscription(userId) {
+  try {
+    const trialStart = new Date();
+    const trialEnd = new Date(trialStart);
+    trialEnd.setDate(trialEnd.getDate() + 30);
 
+    const { error } = await supabase.from("subscriptions").insert({
+      user_id: userId,
+      plan_id: 0,
+      status: "trialing",
+      payment_method: "trial",
+      current_period_start: trialStart.toISOString(),
+      current_period_end: trialEnd.toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      return {
+        success: false,
+        message: `Erro ao criar assinatura: ${error.message}`,
+      };
+    }
+
+    return { success: true, message: "Assinatura criada com sucesso" };
+  } catch (err) {
+    return {
+      success: false,
+      message: `Exceção ao criar assinatura: ${err.message}`,
+    };
+  }
+}
+
+// Função auxiliar para criar company profile
+async function createCompanyProfile(userId, userData) {
+  try {
+    const { error } = await supabase.from("company_profiles").upsert({
+      user_id: userId,
+      name: `${userData.nome} - Empresa`,
+      email: userData.email,
+      phone: userData.telefone,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      return {
+        success: false,
+        message: `Erro ao criar company profile: ${error.message}`,
+      };
+    }
+
+    return { success: true, message: "Company profile criado com sucesso" };
+  } catch (err) {
+    return {
+      success: false,
+      message: `Exceção ao criar company profile: ${err.message}`,
+    };
+  }
+}
+
+// Modal de sucesso para login manual
+function showSuccessModalManualLogin(userData) {
   const modalHtml = `
-    <div class="modal fade show d-block" id="successModal" tabindex="-1" style="background: rgba(0,0,0,0.55); position: fixed; inset: 0; z-index: 1050;">
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg">
+        <div class="modal-content">
           <div class="modal-header bg-success text-white">
-            <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i>Conta criada e ativada!</h5>
-            <button type="button" class="btn-close btn-close-white" onclick="closeSuccessModal()"></button>
+            <h5 class="modal-title">Conta criada com sucesso!</h5>
           </div>
-
           <div class="modal-body">
-            <div class="text-center mb-3">
-              <i class="bi bi-person-check-fill" style="font-size: 3.5rem; color: #198754;"></i>
-            </div>
-            <p class="text-center mb-3">
-              Sua conta trial foi ativada com sucesso!<br>
-              Agora você já pode acessar o sistema imediatamente.
-            </p>
-
-            <ul class="list-unstyled mb-3">
-              <li><strong>Nome:</strong> ${userData.nome}</li>
-              <li><strong>Email:</strong> ${userData.email}</li>
-              <li><strong>Trial válido até:</strong> ${trialEnd.toLocaleDateString(
-                "pt-BR"
-              )}</li>
-            </ul>
-
-            <div class="alert alert-success mt-2">
-              <small>Bem-vindo(a)! Aproveite 30 dias de acesso completo aos recursos da plataforma.</small>
-            </div>
+            <p>Sua conta trial foi criada com sucesso!</p>
+            <p><strong>Email:</strong> ${userData.email}</p>
+            <p>Agora você pode fazer login para acessar o sistema.</p>
           </div>
-
           <div class="modal-footer">
-            <button class="btn btn-outline-secondary" onclick="closeSuccessModal()">Fechar</button>
-            <button class="btn btn-primary" onclick="goToLogin()">Acessar o Sistema</button>
+            <button onclick="window.location.href='https://sarmtech.netlify.app/login/login.html'" class="btn btn-primary">
+              Ir para Login
+            </button>
           </div>
         </div>
       </div>
     </div>
   `;
 
-  const cont = document.createElement("div");
-  cont.id = "successModalContainer";
-  cont.innerHTML = modalHtml;
-  document.body.appendChild(cont);
+  const modalContainer = document.createElement("div");
+  modalContainer.innerHTML = modalHtml;
+  document.body.appendChild(modalContainer);
   document.body.style.overflow = "hidden";
 }
-
-window.closeSuccessModal = function () {
-  const modal = document.getElementById("successModalContainer");
-  if (modal) modal.remove();
-  document.body.style.overflow = "auto";
-};
-
-window.goToLogin = function () {
-  window.closeSuccessModal();
-  window.location.href = "https://sarmtech.netlify.app/login/login.html";
-};
 
 // Export globals
 window.createTrialAccount = createTrialAccount;
