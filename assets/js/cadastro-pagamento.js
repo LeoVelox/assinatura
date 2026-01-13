@@ -387,6 +387,11 @@ async function createTrialAlert(userId, userData) {
 
 await createTrialAlert(userId, userData);
 
+const alertCreated = await createTrialAlert(userId, userData);
+if (alertCreated) {
+  console.log("🔔 Alerta de trial registrado com sucesso");
+}
+
 // Modal de sucesso para login manual
 function showSuccessModalManualLogin(userData) {
   const modalHtml = `
