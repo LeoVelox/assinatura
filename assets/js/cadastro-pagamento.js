@@ -232,7 +232,7 @@ async function createTrialAccount() {
       showSuccessModalManualLogin(userData);
     } else {
       // Login bem-sucedido, redirecionar para dashboard
-      window.location.href = "https://sarmtech.netlify.app/dashboard.html";
+      window.location.href = "https://sarmtech.netlify.app/";
     }
   } catch (error) {
     console.error("❌ Erro ao criar conta:", error);
