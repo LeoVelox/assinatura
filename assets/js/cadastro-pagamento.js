@@ -385,6 +385,8 @@ async function createTrialAlert(userId, userData) {
   }
 }
 
+await createTrialAlert(userId, userData);
+
 // Modal de sucesso para login manual
 function showSuccessModalManualLogin(userData) {
   const modalHtml = `
