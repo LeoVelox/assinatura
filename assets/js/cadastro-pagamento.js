@@ -349,6 +349,42 @@ async function createCompanyProfile(userId, userData) {
   }
 }
 
+// Função para criar alerta quando trial é iniciado
+async function createTrialAlert(userId, userData) {
+  try {
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 30);
+
+    const alertData = {
+      user_id: userId,
+      type: "system",
+      title: "🎉 Trial 30 Dias Iniciado!",
+      message: `Bem-vindo, ${
+        userData.nome
+      }! Seu período de teste gratuito de 30 dias foi ativado. Você tem acesso completo a todos os recursos até ${trialEndDate.toLocaleDateString(
+        "pt-BR"
+      )}.`,
+      priority: "high",
+      related_entity: "user_profiles",
+      related_id: userId,
+      is_read: false,
+      action_url: "/sistema/modulos/modulos.html",
+      created_at: new Date().toISOString(),
+      expires_at: trialEndDate.toISOString(),
+    };
+
+    const { error } = await supabase.from("user_alerts").insert([alertData]);
+
+    if (error) {
+      console.error("❌ Erro ao criar alerta de trial:", error);
+    } else {
+      console.log("✅ Alerta de trial criado com sucesso");
+    }
+  } catch (error) {
+    console.error("❌ Erro ao criar alerta:", error);
+  }
+}
+
 // Modal de sucesso para login manual
 function showSuccessModalManualLogin(userData) {
   const modalHtml = `
