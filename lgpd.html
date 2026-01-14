@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LGPD - SarmTech</title>
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <style>
+      .lgpd-container {
+        max-width: 700px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: var(--color-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+      }
+
+      .lgpd-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--color-primary);
+      }
+
+      .lgpd-badge {
+        display: inline-block;
+        background: var(--color-primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius);
+        margin-bottom: 1rem;
+      }
+
+      .rights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+
+      .right-card {
+        background: var(--color-gray-50);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        border-left: 4px solid var(--color-secondary);
+      }
+
+      .right-card h3 {
+        margin-top: 0;
+        color: var(--color-primary);
+      }
+
+      .contact-box {
+        background: var(--color-primary-light);
+        color: white;
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        margin: 2rem 0;
+        text-align: center;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 2rem;
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+
+      @media (max-width: 768px) {
+        .lgpd-container {
+          margin: 1rem;
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__container">
+        <a href="/" class="logo" aria-label="SarmTech - Página inicial">
+          <div class="logo__icon">
+            <img
+              src="/assets/favicon/apple-touch-icon.png"
+              alt="Logo SarmTech"
+              width="32"
+              height="32"
+            />
+          </div>
+          <span class="logo__text">
+            <strong>SarmTech</strong>
+            <small>Gestão Inteligente</small>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="lgpd-container">
+        <div class="lgpd-header">
+          <span class="lgpd-badge">LGPD</span>
+          <h1>Lei Geral de Proteção de Dados</h1>
+          <p>Nosso compromisso com a proteção de seus dados pessoais</p>
+        </div>
+
+        <h2>O que é a LGPD?</h2>
+        <p>
+          A <strong>Lei Geral de Proteção de Dados (Lei 13.709/2018)</strong> é
+          a legislação brasileira que regula o tratamento de dados pessoais. Ela
+          estabelece direitos para os cidadãos e obrigações para as empresas que
+          coletam dados.
+        </p>
+
+        <div class="contact-box">
+          <h3>Nosso Encarregado de Dados (DPO)</h3>
+          <p>
+            <i class="fas fa-user-shield"></i>
+            <strong>E-mail:</strong> dpo@sarmtech.com
+          </p>
+          <p>
+            <small>Contato exclusivo para assuntos de proteção de dados</small>
+          </p>
+        </div>
+
+        <h2>Seus Direitos na LGPD</h2>
+        <div class="rights-grid">
+          <div class="right-card">
+            <h3><i class="fas fa-check-circle"></i> Confirmação</h3>
+            <p>Direito de saber se tratamos seus dados pessoais.</p>
+          </div>
+
+          <div class="right-card">
+            <h3><i class="fas fa-eye"></i> Acesso</h3>
+            <p>Solicitar uma cópia dos dados que temos sobre você.</p>
+          </div>
+
+          <div class="right-card">
+            <h3><i class="fas fa-edit"></i> Correção</h3>
+            <p>Atualizar dados incompletos, inexatos ou desatualizados.</p>
+          </div>
+
+          <div class="right-card">
+            <h3><i class="fas fa-trash-alt"></i> Exclusão</h3>
+            <p>Solicitar a eliminação de dados desnecessários ou excessivos.</p>
+          </div>
+
+          <div class="right-card">
+            <h3><i class="fas fa-file-export"></i> Portabilidade</h3>
+            <p>Receber dados em formato compatível para transferência.</p>
+          </div>
+
+          <div class="right-card">
+            <h3><i class="fas fa-ban"></i> Revogação</h3>
+            <p>Retirar consentimento dado para tratamento de dados.</p>
+          </div>
+        </div>
+
+        <h2>Como Exercer Seus Direitos</h2>
+        <ol>
+          <li>Envie um e-mail para <strong>lgpd@sarmtech.com</strong></li>
+          <li>Identifique-se (nome completo e e-mail cadastrado)</li>
+          <li>Especifique qual direito deseja exercer</li>
+          <li>Responderemos em até <strong>15 dias úteis</strong></li>
+        </ol>
+
+        <div class="highlight-box">
+          <p>
+            <strong>Para usuários do sistema:</strong> Lembre-se que você também
+            é responsável pelos dados de seus clientes que insere no sistema.
+            Certifique-se de ter consentimento adequado para tratar esses dados.
+          </p>
+        </div>
+
+        <h2>Documentação Importante</h2>
+        <ul>
+          <li>
+            <a href="privacidade.html">Política de Privacidade Completa</a>
+          </li>
+          <li><a href="termos.html">Termos de Uso do Sistema</a></li>
+        </ul>
+
+        <h2>Dúvidas Frequentes</h2>
+
+        <h3>Vocês vendem meus dados?</h3>
+        <p>
+          <strong>Não.</strong> Não vendemos, alugamos ou compartilhamos seus
+          dados com terceiros para marketing.
+        </p>
+
+        <h3>Como meus dados são protegidos?</h3>
+        <p>
+          Usamos criptografia, controle de acesso rigoroso e hospedagem segura
+          no Supabase com certificações internacionais.
+        </p>
+
+        <h3>Posso excluir minha conta e todos meus dados?</h3>
+        <p>
+          <strong>Sim.</strong> Basta solicitar via e-mail. Excluiremos todos
+          seus dados pessoais, exceto informações necessárias para obrigações
+          legais.
+        </p>
+
+        <div class="contact-box">
+          <h3>Precisa de ajuda?</h3>
+          <p>
+            <i class="fas fa-envelope"></i> contato@sarmtech.com<br />
+            <i class="fab fa-whatsapp"></i> (11) 99999-9999
+          </p>
+        </div>
+
+        <a href="/" class="back-link">
+          <i class="fas fa-arrow-left"></i> Voltar para o site
+        </a>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <!-- Insira seu footer aqui -->
+    </footer>
+  </body>
+</html>
