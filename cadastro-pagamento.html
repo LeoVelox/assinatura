@@ -1,230 +1,370 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cadastro Gratuito - SarmTech</title>
+    <title>Comece Grátis - SarmTech</title>
 
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Ícones -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="assets/css/cadastro-pagamento.css" />
 
+    <!-- Favicon -->
     <link rel="icon" href="assets/favicon/favicon.ico" type="image/x-icon" />
     <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
   </head>
   <body>
-    <div class="container cadastro-container">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="cadastro-card">
-            <div class="cadastro-header text-center">
-              <img
-                src="assets/favicon/web-app-manifest-192x192 (2).png"
-                alt="SarmTech"
-                width="80"
-                height="80"
-                class="mb-3"
+    <!-- Background Gradiente -->
+    <div class="background-gradient"></div>
+
+    <!-- Container Principal -->
+    <div class="signup-container">
+      <!-- Card de Cadastro -->
+      <div class="signup-card">
+        <!-- Header -->
+        <header class="signup-header">
+          <div class="logo-container">
+            <img
+              src="assets/favicon/apple-touch-icon.png"
+              alt="SarmTech"
+              class="logo-img"
+            />
+            <div class="logo-text">
+              <h1>SarmTech</h1>
+              <p class="logo-subtitle">Gestão Inteligente</p>
+            </div>
+          </div>
+
+          <div class="signup-intro">
+            <h2 class="signup-title">Comece seus 30 dias grátis</h2>
+            <p class="signup-subtitle">
+              Crie sua conta e descubra como podemos transformar sua gestão de
+              serviços
+            </p>
+          </div>
+
+          <div class="trial-badge">
+            <span class="badge-tag">
+              <i class="fas fa-gift"></i> 30 dias gratuitos
+            </span>
+          </div>
+        </header>
+
+        <!-- Formulário -->
+        <form id="signup-form" novalidate>
+          <!-- Nome -->
+          <div class="form-group">
+            <label for="nome" class="form-label">
+              <i class="fas fa-user"></i> Nome Completo *
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="text"
+                id="nome"
+                class="form-input"
+                placeholder="Digite seu nome completo"
+                required
               />
-              <h1>Comece seus 30 dias grátis</h1>
-              <p class="text-muted">
-                Crie sua conta e descubra como o OSflex pode transformar seu
-                negócio
-              </p>
+              <div class="input-icon">
+                <i class="fas fa-user-circle"></i>
+              </div>
+            </div>
+            <div class="form-feedback">
+              Por favor, informe seu nome completo
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">
+              <i class="fas fa-envelope"></i> E-mail *
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="email"
+                id="email"
+                class="form-input"
+                placeholder="seu@email.com"
+                required
+              />
+              <div class="input-icon">
+                <i class="fas fa-at"></i>
+              </div>
+            </div>
+            <div class="form-feedback">Por favor, informe um e-mail válido</div>
+          </div>
+
+          <!-- CPF/CNPJ -->
+          <div class="form-group">
+            <label for="cpf_cnpj" class="form-label">
+              <i class="fas fa-id-card"></i> CPF ou CNPJ *
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="text"
+                id="cpf_cnpj"
+                class="form-input"
+                placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                required
+              />
+              <div class="input-icon">
+                <i class="fas fa-fingerprint"></i>
+              </div>
+            </div>
+            <div class="form-feedback">
+              Por favor, informe um CPF ou CNPJ válido
+            </div>
+            <small class="form-hint"
+              >Informe apenas números ou com pontuação</small
+            >
+          </div>
+
+          <!-- Senha -->
+          <div class="form-group">
+            <label for="senha" class="form-label">
+              <i class="fas fa-lock"></i> Senha *
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="senha"
+                class="form-input"
+                placeholder="Mínimo 8 caracteres"
+                required
+              />
+              <div class="input-icon">
+                <i class="fas fa-key"></i>
+              </div>
+              <button type="button" class="password-toggle" id="togglePassword">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="form-feedback">
+              A senha deve ter pelo menos 8 caracteres
             </div>
 
-            <form id="signup-form" novalidate class="fade-in">
-              <div class="mb-3">
-                <label for="nome" class="form-label">Nome Completo *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="nome"
-                  placeholder="Seu nome completo"
-                />
-                <div class="invalid-feedback">
-                  Por favor, informe seu nome completo.
-                </div>
+            <!-- Força da Senha -->
+            <div class="password-strength">
+              <div class="strength-bar">
+                <div class="strength-progress" id="strengthProgress"></div>
               </div>
-
-              <div class="mb-3">
-                <label for="email" class="form-label">E-mail *</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="email"
-                  placeholder="seu@email.com"
-                />
-                <div class="invalid-feedback">
-                  Por favor, informe um e-mail válido.
-                </div>
+              <div class="strength-text" id="strengthText">
+                Segurança da senha
               </div>
+            </div>
 
-              <div class="mb-3">
-                <label for="cpf_cnpj" class="form-label">CPF ou CNPJ *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cpf_cnpj"
-                  placeholder="000.000.000-00 ou 00.000.000/0000-00"
-                />
-                <div class="invalid-feedback">
-                  Por favor, informe um CPF ou CNPJ válido.
-                </div>
-                <small class="form-text text-muted"
-                  >Informe apenas números ou com pontuação</small
-                >
+            <div class="password-tips" id="passwordTips">
+              Dica: Use letras maiúsculas, números e caracteres especiais
+            </div>
+          </div>
+
+          <!-- Telefone -->
+          <div class="form-group">
+            <label for="telefone" class="form-label">
+              <i class="fas fa-phone"></i> Telefone (Opcional)
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="tel"
+                id="telefone"
+                class="form-input"
+                placeholder="(11) 99999-9999"
+              />
+              <div class="input-icon">
+                <i class="fas fa-mobile-alt"></i>
               </div>
+            </div>
+          </div>
 
-              <div class="mb-3">
-                <label for="senha" class="form-label">Senha *</label>
-                <div class="input-group">
-                  <span class="input-group-text"
-                    ><i class="bi bi-lock"></i
-                  ></span>
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="senha"
-                    placeholder="Mínimo 8 caracteres"
-                  />
-                  <button
-                    class="btn btn-outline-secondary toggle-password"
-                    type="button"
-                  >
-                    <i class="bi bi-eye"></i>
-                  </button>
+          <!-- Termos -->
+          <div class="form-group terms-group">
+            <div class="checkbox-wrapper">
+              <input
+                type="checkbox"
+                id="terms"
+                class="checkbox-input"
+                required
+              />
+              <label for="terms" class="checkbox-label">
+                <div class="checkbox-box">
+                  <i class="fas fa-check checkbox-check"></i>
                 </div>
-                <div class="invalid-feedback">
-                  A senha deve ter pelo menos 8 caracteres.
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label for="telefone" class="form-label">Telefone</label>
-                <input
-                  type="tel"
-                  class="form-control"
-                  id="telefone"
-                  placeholder="(11) 99999-9999"
-                />
-              </div>
-
-              <div class="mb-3 form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="terms"
-                  required
-                />
-                <label class="form-check-label" for="terms">
+                <span class="checkbox-text">
                   Concordo com os
-                  <a
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#termsModal"
-                    >Termos de Serviço</a
+                  <a href="termos.html" class="terms-link">Termos de Serviço</a>
+                  e
+                  <a href="privacidade.html" class="terms-link"
+                    >Política de Privacidade</a
                   >
-                </label>
-                <div class="invalid-feedback">
-                  Você deve aceitar os termos para continuar.
-                </div>
-              </div>
+                </span>
+              </label>
+            </div>
+            <div class="form-feedback">
+              Você deve aceitar os termos para continuar
+            </div>
+          </div>
 
-              <div class="d-grid gap-2">
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-lg"
-                  id="btn-cadastrar"
-                >
-                  <span class="submit-text">Criar Minha Conta Grátis</span>
-                  <span
-                    class="spinner-border spinner-border-sm d-none"
-                    id="spinner"
-                    role="status"
-                  ></span>
-                </button>
-              </div>
-            </form>
+          <!-- Botão de Cadastro -->
+          <button type="submit" class="signup-button" id="btn-cadastrar">
+            <span class="button-content">
+              <span class="button-text">Criar Minha Conta Grátis</span>
+              <span class="button-icon">
+                <i class="fas fa-rocket"></i>
+              </span>
+            </span>
+            <span class="button-loader" id="spinner">
+              <div class="loader"></div>
+            </span>
+          </button>
+        </form>
 
-            <div class="cadastro-footer text-center mt-4">
-              <p class="text-muted">
-                <small>
-                  ✅ Teste completo de 30 dias<br />
-                  ✅ Sem necessidade de pagamento para testar<br />
-                  ✅ Suporte incluído durante o trial
-                </small>
-              </p>
-              <p class="mt-3">
-                <small
-                  >Já tem uma conta? <a href="login.html">Fazer login</a></small
-                >
-              </p>
+        <!-- Footer -->
+        <footer class="signup-footer">
+          <div class="benefits-grid">
+            <div class="benefit-item">
+              <i class="fas fa-check-circle benefit-icon"></i>
+              <div class="benefit-content">
+                <h4>Teste completo</h4>
+                <p>30 dias com todas as funcionalidades</p>
+              </div>
+            </div>
+
+            <div class="benefit-item">
+              <i class="fas fa-credit-card benefit-icon"></i>
+              <div class="benefit-content">
+                <h4>Sem pagamento</h4>
+                <p>Não precisa de cartão para testar</p>
+              </div>
+            </div>
+
+            <div class="benefit-item">
+              <i class="fas fa-headset benefit-icon"></i>
+              <div class="benefit-content">
+                <h4>Suporte incluído</h4>
+                <p>Ajuda durante todo o período</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="login-redirect">
+            <p>
+              Já tem uma conta?
+              <a href="login.html" class="login-link">Faça login aqui</a>
+            </p>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Mensagem Lateral (Desktop) -->
+      <div class="side-message">
+        <div class="message-content">
+          <h3 class="message-title">Por que escolher o SarmTech?</h3>
+
+          <div class="message-list">
+            <div class="message-item">
+              <div class="message-icon">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <div>
+                <h4>75% mais rápido</h4>
+                <p>Automatize processos manuais</p>
+              </div>
+            </div>
+
+            <div class="message-item">
+              <div class="message-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div>
+                <h4>Gestão completa</h4>
+                <p>Do orçamento ao laudo técnico</p>
+              </div>
+            </div>
+
+            <div class="message-item">
+              <div class="message-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div>
+                <h4>Segurança garantida</h4>
+                <p>Conformidade com LGPD</p>
+              </div>
+            </div>
+
+            <div class="message-item">
+              <div class="message-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <div>
+                <h4>Totalmente responsivo</h4>
+                <p>Funciona em qualquer dispositivo</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial">
+            <div class="testimonial-text">
+              "O SarmTech revolucionou nossa gestão de serviços técnicos."
+            </div>
+            <div class="testimonial-author">
+              <div class="author-info">
+                <strong>Carlos Silva</strong>
+                <span>Técnico em Refrigeração</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal de Termos -->
-    <div
-      class="modal fade"
-      id="termsModal"
-      tabindex="-1"
-      aria-labelledby="termsModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="termsModalLabel">Termos de Serviço</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+    <!-- Modal de Sucesso -->
+    <div class="modal-overlay" id="successModal">
+      <div class="modal-container">
+        <div class="modal-content success-modal">
+          <div class="modal-icon">
+            <i class="fas fa-check-circle"></i>
           </div>
-          <div class="modal-body">
-            <h6>Período de Teste Gratuito</h6>
-            <p>
-              Você terá acesso completo ao sistema por 30 dias gratuitamente.
-            </p>
+          <h3 class="modal-title">Conta criada com sucesso!</h3>
+          <p class="modal-text" id="successEmail">
+            Sua conta trial de 30 dias foi ativada com sucesso.
+          </p>
 
-            <h6>Uso da Plataforma</h6>
-            <p>
-              Concorda em usar a plataforma apenas para fins legais e
-              profissionais.
-            </p>
-
-            <h6>Propriedade Intelectual</h6>
-            <p>Todo o conteúdo do sistema é propriedade da SarmTech.</p>
-
-            <h6>Privacidade</h6>
-            <p>
-              Seus dados serão protegidos conforme nossa Política de
-              Privacidade.
-            </p>
-          </div>
-          <div class="modal-footer">
+          <div class="modal-actions">
             <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
+              class="modal-button primary"
+              onclick="window.location.href='https://sarmtech.netlify.app/'"
             >
-              Fechar
+              <i class="fas fa-rocket"></i> Acessar Sistema
+            </button>
+            <button
+              class="modal-button secondary"
+              onclick="window.location.href='login.html'"
+            >
+              <i class="fas fa-sign-in-alt"></i> Fazer Login
             </button>
           </div>
+
+          <button class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
     <script type="module" src="assets/js/cadastro-pagamento.js"></script>
     <script type="module">
       import { supabase } from "./assets/js/supabaseClient.js";
