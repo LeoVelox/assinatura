@@ -1,680 +1,287 @@
-<!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<!doctype html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Sistema de Gestão de Orçamentos e Ordens de Serviço - Automatize e profissionalize seus processos com o OSflex"
-    />
-    <meta property="og:title" content="OSflex | Gestão de Orçamentos e OS" />
-    <meta
-      property="og:description"
-      content="Crie orçamentos profissionais e converta em ordens de serviço com um clique"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f1b2d" />
+    <title>Nexo: orçamentos, ordens de serviço e agenda para quem presta serviço</title>
+    <meta name="description" content="Organize clientes, orçamentos, ordens de serviço, agenda e laudos em um só lugar. Teste o Nexo por 30 dias, grátis e sem cartão." />
+    <link rel="canonical" href="https://sarmtech.com.br/" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
-    <title>SarmTech | Gestão de Orçamentos e Ordens de Serviço</title>
-
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <link rel="icon" href="assets/favicon/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Nexo: do orçamento ao recebimento, tudo em ordem" />
+    <meta property="og:description" content="Clientes, orçamentos, ordens de serviço, agenda e laudos em um só lugar. 30 dias grátis, sem cartão." />
+    <meta property="og:url" content="https://sarmtech.com.br/" />
+    <meta property="og:image" content="https://sarmtech.com.br/img/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <!-- Skip to content -->
-    <a href="#main-content" class="skip-link">Ir para o conteúdo principal</a>
+    <a class="skip" href="#cadastro">Ir para o cadastro</a>
 
-    <!-- Header -->
-    <header class="header" role="banner">
-      <div class="container header__container">
-        <a href="/" class="logo" aria-label="SarmTech - Página inicial">
-          <div class="/">
-            <img
-              src="/assets/favicon/apple-touch-icon.png"
-              alt="Logo SarmTech"
-              width="40"
-              height="40"
-              loading="eager"
-            />
-          </div>
-          <span class="logo__text">
-            <strong>SarmTech</strong>
-            <small>Sistemas Inteligentes</small>
-          </span>
+    <header class="top">
+      <div class="wrap top__in">
+        <a class="brand" href="/" aria-label="Nexo, página inicial">
+          <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="15" fill="#1f63f0" />
+            <path d="M18 45V19l28 26V19" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="18" cy="45" r="5.5" fill="#fff" />
+            <circle cx="46" cy="19" r="5.5" fill="#ffb81c" />
+          </svg>
+          <span>Nexo</span>
         </a>
-
-        <button
-          class="nav-toggle"
-          aria-label="Abrir menu"
-          aria-expanded="false"
-          aria-controls="main-nav"
-        >
-          <span class="nav-toggle__line"></span>
-          <span class="nav-toggle__line"></span>
-          <span class="nav-toggle__line"></span>
-        </button>
-
-        <nav id="main-nav" class="nav" role="navigation">
-          <ul class="nav__list">
-            <li class="nav__item">
-              <a href="#workflow" class="nav__link">Recursos</a>
-            </li>
-            <li class="nav__item">
-              <a href="#features" class="nav__link">Funcionalidades</a>
-            </li>
-            <li class="nav__item">
-              <a href="#benefits" class="nav__link">Benefícios</a>
-            </li>
-            <li class="nav__item">
-              <a href="#testimonials" class="nav__link">Depoimentos</a>
-            </li>
-            <li class="nav__item">
-              <a
-                href="https://sarmtech.netlify.app/"
-                class="nav__link nav__link--login"
-              >
-                <i class="fas fa-sign-in-alt"></i> Login
-              </a>
-            </li>
-          </ul>
+        <nav class="top__nav" aria-label="Seções">
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#planos">Planos</a>
+          <a href="#perguntas">Perguntas</a>
         </nav>
-
-        <div class="header__actions">
-          <button class="theme-toggle" aria-label="Alternar tema claro/escuro">
-            <i class="fas fa-sun theme-icon"></i>
-            <i class="fas fa-moon theme-icon"></i>
-          </button>
-          <a href="cadastro-pagamento.html" class="btn btn--primary btn--small"
-            >Começar grátis</a
-          >
+        <div class="top__act">
+          <a class="top__login" data-app-link="/login" href="https://app.sarmtech.com.br/login">Entrar</a>
+          <a class="btn btn--small" href="#cadastro">Testar grátis</a>
         </div>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main id="main-content">
-      <!-- Hero Section -->
-      <section class="hero" role="region" aria-labelledby="hero-title">
-        <div class="container hero__container">
-          <div class="hero__content">
-            <h1 id="hero-title" class="hero__title">
-              Crie <span class="text-gradient">Orçamentos</span> e Transforme em
-              <span class="text-gradient">Ordens de Serviço</span> com um clique
-            </h1>
-            <p class="hero__description">
-              O sistema completo para Autônomos, MEI`s e empresas de serviços
-              técnicos. Automatize processos, gere documentos profissionais e
-              aumente sua produtividade em até 75%.
-            </p>
-            <div class="hero__cta">
-              <a
-                href="cadastro-pagamento.html"
-                class="btn btn--primary btn--large btn--icon"
-              >
-                <i class="fas fa-rocket"></i> Teste grátis por 30 dias
-              </a>
-              <a href="#demo-video" class="btn btn--outline btn--large">
-                <i class="fas fa-play-circle"></i> Ver demonstração
-              </a>
-            </div>
-            <div class="hero__stats">
-              <div class="stat">
-                <i class="fas fa-mouse-pointer"></i>
-                <strong>1 Clique</strong>
-                <span>Orçamento→OS</span>
-              </div>
-              <div class="stat">
-                <i class="fas fa-gift"></i>
-                <strong>R$0</strong>
-                <span>Para começar</span>
-              </div>
-              <div class="stat">
-                <i class="fas fa-bolt"></i>
-                <strong>+75%</strong>
-                <span>Mais rápido</span>
-              </div>
-            </div>
+    <main>
+      <section class="hero">
+        <div class="wrap hero__in">
+          <div class="hero__text">
+            <h1>Do orçamento ao recebimento, tudo em ordem.</h1>
+            <p class="hero__lead">O Nexo reúne clientes, orçamentos, ordens de serviço, agenda e laudos para quem presta serviço. Funciona no celular e no computador.</p>
+            <ul class="hero__list">
+              <li>30 dias grátis, com todos os recursos liberados</li>
+              <li>Sem cartão de crédito para começar</li>
+              <li>Depois, planos a partir de R$&nbsp;39,90 por mês</li>
+            </ul>
           </div>
-          <div class="hero__image">
-            <div class="dashboard-preview">
-              <div class="dashboard-preview__header">
-                <div class="dashboard-preview__controls">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
+
+          <div class="signup" id="cadastro">
+            <form class="signup__form" id="signup-form" novalidate>
+              <h2>Crie sua conta</h2>
+              <p class="signup__sub">Os 30 dias de teste começam assim que você se cadastra.</p>
+
+              <p class="alert alert--bad" id="signup-error" role="alert" hidden></p>
+
+              <div class="field">
+                <label for="nome">Seu nome</label>
+                <input id="nome" name="nome" type="text" autocomplete="name" required maxlength="120" />
               </div>
-              <img
-                src="assets/images/TelaSarmtech.jpg"
-                alt="Dashboard do OSflex mostrando gestão de orçamentos e ordens de serviço"
-                loading="eager"
-              />
+              <div class="field">
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" required maxlength="160" />
+              </div>
+              <div class="field">
+                <label for="senha">Senha</label>
+                <div class="field__pw">
+                  <input id="senha" name="senha" type="password" autocomplete="new-password" minlength="8" required maxlength="72" aria-describedby="senha-dica" />
+                  <button type="button" class="field__eye" id="ver-senha" aria-label="Mostrar a senha" aria-pressed="false">Mostrar</button>
+                </div>
+                <small id="senha-dica">Pelo menos 8 caracteres.</small>
+              </div>
+
+              <div class="trap" aria-hidden="true">
+                <label for="site">Não preencha este campo</label>
+                <input id="site" name="site" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <label class="check">
+                <input id="aceite" type="checkbox" required />
+                <span>Li e aceito os <a data-app-link="/termos" href="https://app.sarmtech.com.br/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a data-app-link="/privacidade" href="https://app.sarmtech.com.br/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
+              </label>
+
+              <button class="btn btn--wide" id="signup-btn" type="submit">Criar conta e começar os 30 dias</button>
+              <p class="signup__foot">Já tem conta? <a data-app-link="/login" href="https://app.sarmtech.com.br/login">Entrar</a></p>
+            </form>
+
+            <div class="signup__done" id="signup-done" role="status" tabindex="-1" hidden>
+              <h2>Falta só confirmar o e-mail</h2>
+              <p>Enviamos um link para <b id="done-email"></b>. Abra a mensagem e clique no link para ativar a conta.</p>
+              <p class="muted">Não chegou? Veja a caixa de spam. O link serve para entrar no Nexo, e seus 30 dias de teste já estão reservados.</p>
+              <a class="btn btn--wide" data-app-link="/login" href="https://app.sarmtech.com.br/login">Ir para o login</a>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Workflow Section -->
-      <section
-        id="workflow"
-        class="workflow"
-        role="region"
-        aria-labelledby="workflow-title"
-      >
-        <div class="container">
-          <div class="section-header">
-            <h2 id="workflow-title" class="section-title">
-              Fluxo completo de gestão
-            </h2>
-            <p class="section-subtitle">
-              Do orçamento ao laudo técnico, tudo em um só lugar
-            </p>
+      <section class="shot" aria-label="Telas do Nexo">
+        <div class="wrap">
+          <figure class="shot__main">
+            <picture>
+              <source media="(max-width: 560px)" srcset="/img/hoje-celular.webp" width="780" height="1600" />
+              <img src="/img/hoje.webp" width="1360" height="860" alt="Tela Hoje do Nexo: a rota do dia com os serviços, o que há a receber e os orçamentos esperando resposta." />
+            </picture>
+            <figcaption>Tela inicial do Nexo, com dados de exemplo.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="flow" id="como-funciona">
+        <div class="wrap flow__in">
+          <div class="flow__text">
+            <h2>Um fluxo só, do primeiro contato ao pagamento</h2>
+            <ol class="steps">
+              <li class="step step--done">
+                <h3>Orçamento</h3>
+                <p>Monte com itens, prazo estimado e condições de pagamento. O PDF sai com a logo da sua empresa, pronto para enviar pelo WhatsApp.</p>
+              </li>
+              <li class="step step--done">
+                <h3>Aprovação</h3>
+                <p>Quando o cliente aprova, o orçamento vira ordem de serviço, sem digitar tudo de novo.</p>
+              </li>
+              <li class="step step--now">
+                <h3>Agenda</h3>
+                <p>Marque por hora ou por empreita, de vários dias. O sistema não deixa a mesma pessoa ter dois serviços no mesmo horário.</p>
+              </li>
+              <li class="step">
+                <h3>Execução</h3>
+                <p>Registre o laudo técnico com fotos e a assinatura do cliente, direto do celular.</p>
+              </li>
+              <li class="step">
+                <h3>Recebimento</h3>
+                <p>Registre entrada e parcelas, veja o que ainda falta receber e lembre o cliente pelo WhatsApp.</p>
+              </li>
+            </ol>
           </div>
+          <figure class="flow__shot">
+            <img src="/img/agenda.webp" width="1360" height="860" loading="lazy" alt="Agenda semanal do Nexo, com serviços por hora e uma empreita de vários dias." />
+            <figcaption>Agenda da semana, com dados de exemplo.</figcaption>
+          </figure>
+        </div>
+      </section>
 
-          <div class="workflow__steps">
-            <div class="workflow-step">
-              <div class="workflow-step__icon">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <span class="step-number">1</span>
-              </div>
-              <h3>Orçamento</h3>
-              <p>Crie propostas profissionais em minutos</p>
-            </div>
+      <section class="incl">
+        <div class="wrap">
+          <h2>O que você usa no dia a dia</h2>
+          <dl class="incl__list">
+            <div><dt>Clientes</dt><dd>Seus clientes sempre à mão, para criar orçamentos e ordens em segundos.</dd></div>
+            <div><dt>Orçamentos</dt><dd>Prazo estimado, parcelas e PDF com a sua marca.</dd></div>
+            <div><dt>Ordens de serviço</dt><dd>Status, responsável, data e valor recebido.</dd></div>
+            <div><dt>Agenda</dt><dd>Visão por semana e por mês, por pessoa, com bloqueio de dias.</dd></div>
+            <div><dt>Laudos técnicos</dt><dd>Fotos, observações e assinatura, em PDF.</dd></div>
+            <div><dt>Equipe</dt><dd>Cada pessoa entra com acesso próprio e você define o que ela vê.</dd></div>
+            <div><dt>Relatórios</dt><dd>Os serviços e os valores do período, num só lugar.</dd></div>
+          </dl>
+          <p class="incl__note">Laudos e relatórios estão nos planos Intermediário e Avançado. No teste de 30 dias, tudo fica liberado.</p>
+        </div>
+      </section>
 
-            <div class="workflow-step">
-              <div class="workflow-step__icon">
-                <i class="fas fa-check-circle"></i>
-                <span class="step-number">2</span>
-              </div>
-              <h3>Aprovação do Cliente</h3>
-              <p>Envie o orçamento via WhatsApp ou e-mail para aprovação</p>
-            </div>
+      <section class="plans" id="planos">
+        <div class="wrap">
+          <h2>Planos</h2>
+          <p class="plans__lead">Teste 30 dias com tudo liberado. Depois, escolha o plano pelo tamanho da sua equipe.</p>
+          <div class="plans__grid">
+            <article class="plan">
+              <h3>Básico</h3>
+              <p class="plan__price"><b>R$&nbsp;39,90</b> <span>por mês</span></p>
+              <p class="plan__users">Até 2 usuários</p>
+              <ul class="plan__list">
+                <li>Clientes, orçamentos e ordens de serviço</li>
+                <li>Agenda</li>
+                <li>PDF com a logo da empresa</li>
+              </ul>
+              <p class="plan__year">No anual, R$&nbsp;31,90 por mês</p>
+              <a class="btn btn--ghost" href="#cadastro">Testar 30 dias grátis</a>
+            </article>
+            <article class="plan plan--main">
+              <span class="plan__flag">Mais escolhido</span>
+              <h3>Intermediário</h3>
+              <p class="plan__price"><b>R$&nbsp;79,90</b> <span>por mês</span></p>
+              <p class="plan__users">Até 5 usuários</p>
+              <ul class="plan__list">
+                <li>Tudo do Básico</li>
+                <li>Laudos com fotos e assinatura</li>
+                <li>Relatórios do período</li>
+                <li>Papel Atendimento para a equipe</li>
+              </ul>
+              <p class="plan__year">No anual, R$&nbsp;63,90 por mês</p>
+              <a class="btn" href="#cadastro">Testar 30 dias grátis</a>
+            </article>
+            <article class="plan">
+              <h3>Avançado</h3>
+              <p class="plan__price"><b>R$&nbsp;129,90</b> <span>por mês</span></p>
+              <p class="plan__users">Até 10 usuários</p>
+              <ul class="plan__list">
+                <li>Tudo do Intermediário</li>
+                <li>Permissões por pessoa e perfis de acesso</li>
+              </ul>
+              <p class="plan__year">No anual, R$&nbsp;103,90 por mês</p>
+              <a class="btn btn--ghost" href="#cadastro">Testar 30 dias grátis</a>
+            </article>
+          </div>
+          <p class="plans__note">O plano anual tem 20% de desconto. Pagamento pelo Mercado Pago, com Pix ou cartão.</p>
+        </div>
+      </section>
 
-            <div class="workflow-step">
-              <div class="workflow-step__icon">
-                <i class="fas fa-clipboard-list"></i>
-                <span class="step-number">3</span>
-              </div>
-              <h3>Ordem de Serviço</h3>
-              <p>Crie a OS com dados pré-preenchidos do orçamento</p>
-            </div>
-
-            <div class="workflow-step">
-              <div class="workflow-step__icon">
-                <i class="fas fa-file-contract"></i>
-                <span class="step-number">4</span>
-              </div>
-              <h3>Laudo Técnico</h3>
-              <p>Gere documentação profissional</p>
-            </div>
+      <section class="faq" id="perguntas">
+        <div class="wrap faq__in">
+          <h2>Perguntas frequentes</h2>
+          <div class="faq__list">
+            <details>
+              <summary>Preciso de cartão de crédito para testar?</summary>
+              <p>Não. Você cria a conta só com nome, e-mail e senha.</p>
+            </details>
+            <details>
+              <summary>O que acontece quando os 30 dias acabam?</summary>
+              <p>Nada é apagado. Você continua consultando tudo, mas só volta a editar depois de escolher um plano.</p>
+            </details>
+            <details>
+              <summary>Como eu pago?</summary>
+              <p>Pelo Mercado Pago, com Pix ou cartão. No plano anual, o cartão pode ser parcelado. Depois do pagamento, liberamos o plano em até 1 dia útil.</p>
+            </details>
+            <details>
+              <summary>Funciona no celular?</summary>
+              <p>Sim. Abre no navegador do celular e pode ser instalado na tela inicial, como um aplicativo. É preciso ter internet: ainda não existe modo offline.</p>
+            </details>
+            <details>
+              <summary>Posso usar com a minha equipe?</summary>
+              <p>Sim: até 2, 5 ou 10 usuários, conforme o plano. Cada pessoa entra com acesso próprio e você define o que ela pode ver. No Avançado, com perfis e permissões por pessoa.</p>
+            </details>
+            <details>
+              <summary>E os dados dos meus clientes?</summary>
+              <p>Ficam na sua conta, separados dos de outras empresas. Tratamos os dados conforme a LGPD, e os detalhes estão na <a data-app-link="/privacidade" href="https://app.sarmtech.com.br/privacidade">Política de Privacidade</a>.</p>
+            </details>
+            <details>
+              <summary>Posso cancelar?</summary>
+              <p>Sim. As regras de cancelamento, arrependimento e reembolso estão nos <a data-app-link="/termos" href="https://app.sarmtech.com.br/termos">Termos de Uso</a>.</p>
+            </details>
           </div>
         </div>
       </section>
 
-      <!-- Features Section -->
-      <section
-        id="features"
-        class="features"
-        role="region"
-        aria-labelledby="features-title"
-      >
-        <div class="container">
-          <div class="section-header">
-            <h2 id="features-title" class="section-title">
-              Tudo que você precisa
-            </h2>
-            <p class="section-subtitle">
-              Módulos integrados para gestão completa
-            </p>
-          </div>
-
-          <div class="features__grid">
-            <article class="feature-card">
-              <div class="feature-card__icon">
-                <i class="fas fa-users"></i>
-              </div>
-              <h3>Gestão de Clientes</h3>
-              <p>
-                Centralize todas as informações dos seus clientes com histórico
-                completo de interações.
-              </p>
-              <ul class="feature-list">
-                <li><i class="fas fa-check"></i> Cadastro completo</li>
-                <li><i class="fas fa-check"></i> Histórico de serviços</li>
-                <li><i class="fas fa-check"></i> Busca inteligente</li>
-              </ul>
-            </article>
-
-            <article class="feature-card feature-card--highlight">
-              <div class="feature-card__icon">
-                <i class="fas fa-file-invoice"></i>
-              </div>
-              <h3>Orçamentos</h3>
-              <p>
-                Crie propostas profissionais com cálculos automáticos e envio
-                digital.
-              </p>
-              <ul class="feature-list">
-                <li><i class="fas fa-check"></i> Cálculos automáticos</li>
-                <li><i class="fas fa-check"></i> Modelos personalizados</li>
-                <li>
-                  <i class="fas fa-check"></i> Envio por WhatsApp ou e-mail
-                </li>
-              </ul>
-            </article>
-
-            <article class="feature-card">
-              <div class="feature-card__icon">
-                <i class="fas fa-tools"></i>
-              </div>
-              <h3>Ordens de Serviço</h3>
-              <p>
-                Converta orçamentos aprovados em OS com um clique e gerencie
-                execução.
-              </p>
-              <ul class="feature-list">
-                <li><i class="fas fa-check"></i> Conversão em minutos</li>
-                <li><i class="fas fa-check"></i> Agendamento</li>
-                <li><i class="fas fa-check"></i> Acompanhamento</li>
-              </ul>
-            </article>
-
-            <article class="feature-card">
-              <div class="feature-card__icon">
-                <i class="fas fa-file-contract"></i>
-              </div>
-              <h3>Laudos Técnicos</h3>
-              <p>
-                Documente serviços com fotos, assinaturas e informações
-                técnicas.
-              </p>
-              <ul class="feature-list">
-                <li><i class="fas fa-check"></i> Fotos antes/depois</li>
-                <li><i class="fas fa-check"></i> Assinatura digital</li>
-                <li><i class="fas fa-check"></i> PDF profissional</li>
-              </ul>
-            </article>
-
-            <article class="feature-card">
-              <div class="feature-card__icon">
-                <i class="fas fa-chart-line"></i>
-              </div>
-              <h3>Dashboard & Relatórios</h3>
-              <p>
-                Visualize métricas e gere relatórios para tomada de decisão.
-              </p>
-              <ul class="feature-list">
-                <li><i class="fas fa-check"></i> Métricas em tempo real</li>
-                <li><i class="fas fa-check"></i> Gráficos interativos</li>
-                <li><i class="fas fa-check"></i> Exportação PDF/CSV</li>
-              </ul>
-            </article>
-
-            <article class="feature-card">
-              <div class="feature-card__icon">
-                <i class="fas fa-mobile-alt"></i>
-              </div>
-              <h3>Acesso Mobile</h3>
-              <p>
-                Acesse o sistema de qualquer dispositivo com design responsivo.
-              </p>
-              <ul class="feature-list">
-                <li><i class="fas fa-check"></i> Totalmente responsivo</li>
-                <li><i class="fas fa-check"></i> App para técnicos</li>
-                <li><i class="fas fa-check"></i> Offline support</li>
-              </ul>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- Benefits Section -->
-      <section
-        id="benefits"
-        class="benefits"
-        role="region"
-        aria-labelledby="benefits-title"
-      >
-        <div class="container">
-          <div class="section-header">
-            <h2 id="benefits-title" class="section-title">
-              Resultados mensuráveis
-            </h2>
-            <p class="section-subtitle">
-              Veja os benefícios que nossos clientes alcançaram
-            </p>
-          </div>
-
-          <div class="benefits__grid">
-            <div class="benefit-card">
-              <div class="benefit-card__value">75%</div>
-              <h3>Menos tempo</h3>
-              <p>Redução no tempo de criação de documentos</p>
-            </div>
-
-            <div class="benefit-card">
-              <div class="benefit-card__value">3x</div>
-              <h3>Mais produtividade</h3>
-              <p>Aumento na capacidade de atendimento</p>
-            </div>
-
-            <div class="benefit-card">
-              <div class="benefit-card__value">100%</div>
-              <h3>Menos erros</h3>
-              <p>Eliminação de erros de cálculo manuais</p>
-            </div>
-
-            <div class="benefit-card">
-              <div class="benefit-card__value">40%</div>
-              <h3>Mais conversões</h3>
-              <p>Aumento na taxa de aprovação de orçamentos</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Demo Section -->
-      <section
-        id="demo-video"
-        class="demo"
-        role="region"
-        aria-labelledby="demo-title"
-      >
-        <div class="container">
-          <div class="demo__content">
-            <div class="demo__info">
-              <h2 id="demo-title" class="section-title">
-                Veja o OSflex em ação
-              </h2>
-              <p class="section-subtitle">
-                Interface intuitiva criada para técnicos e gestores
-              </p>
-
-              <div class="demo__features">
-                <div class="demo-feature">
-                  <i class="fas fa-bolt"></i>
-                  <div>
-                    <h4>Rápido e eficiente</h4>
-                    <p>Crie uma OS completa em menos de 1 minuto</p>
-                  </div>
-                </div>
-
-                <div class="demo-feature">
-                  <i class="fas fa-mobile-alt"></i>
-                  <div>
-                    <h4>Totalmente responsivo</h4>
-                    <p>Funciona perfeitamente em celulares e tablets</p>
-                  </div>
-                </div>
-
-                <div class="demo-feature">
-                  <i class="fas fa-shield-alt"></i>
-                  <div>
-                    <h4>Segurança garantida</h4>
-                    <p>Seus dados protegidos com criptografia de ponta</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="demo__video">
-              <div class="video-wrapper">
-                <video
-                  controls
-                  poster="assets/images/testimonials/Screenshot_1.png"
-                  preload="metadata"
-                >
-                  <source src="assets/videos/Nature.webm" type="video/mp4" />
-                  Seu navegador não suporta vídeo HTML5.
-                </video>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Testimonials -->
-      <section
-        id="testimonials"
-        class="testimonials"
-        role="region"
-        aria-labelledby="testimonials-title"
-      >
-        <div class="container">
-          <div class="section-header">
-            <h2 id="testimonials-title" class="section-title">
-              Quem usa recomenda
-            </h2>
-            <p class="section-subtitle">
-              Diversos profissionais já transformaram seu negócio
-            </p>
-          </div>
-
-          <div class="testimonials__grid">
-            <article class="testimonial-card">
-              <div class="testimonial-rating">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-              </div>
-              <p class="testimonial-text">
-                "SarmTech revolucionou nossa assistência técnica. Agora emitimos
-                documentos profissionais em segundos e nossos clientes
-                adoraram."
-              </p>
-              <div class="testimonial-author">
-                <img
-                  src="assets/images/testimonials/edmilson.jpg"
-                  alt="Carlos Silva"
-                />
-                <div>
-                  <h4>Edmilson Silva</h4>
-                  <span>Técnico de Aquecedores e fogão</span>
-                </div>
-              </div>
-            </article>
-
-            <article class="testimonial-card">
-              <div class="testimonial-rating">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-              </div>
-              <p class="testimonial-text">
-                "Como dona de uma pequena assistência, o OSflex me ajudou a
-                organizar tudo. A comunicação com clientes melhorou muito."
-              </p>
-              <div class="testimonial-author">
-                <img
-                  src="assets/images/testimonials/2.webp"
-                  alt="Ana Oliveira"
-                />
-                <div>
-                  <h4>Ana Oliveira</h4>
-                  <span>Assistência Técnica</span>
-                </div>
-              </div>
-            </article>
-
-            <article class="testimonial-card">
-              <div class="testimonial-rating">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star-half-alt"></i>
-              </div>
-              <p class="testimonial-text">
-                "Implementamos em nossa equipe de 8 técnicos e o retorno foi
-                imediato. A padronização e o histórico foram diferenciais."
-              </p>
-              <div class="testimonial-author">
-                <img
-                  src="assets/images/testimonials/3.webp"
-                  alt="Ricardo Mendes"
-                />
-                <div>
-                  <h4>Ricardo Mendes</h4>
-                  <span>Gerente de Manutenção</span>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- CTA Section -->
-      <section class="cta" role="region" aria-labelledby="cta-title">
-        <div class="container">
-          <div class="cta__content">
-            <h2 id="cta-title" class="cta__title">
-              Pronto para transformar sua gestão?
-            </h2>
-            <p class="cta__text">
-              Experimente gratuitamente por 30 dias. Sem compromisso, sem cartão
-              de crédito.
-            </p>
-            <div class="cta__actions">
-              <a
-                href="cadastro-pagamento.html"
-                class="btn btn--primary btn--large"
-              >
-                <i class="fas fa-play-circle"></i> Começar agora
-              </a>
-              <a href="https://wa.me/5511999999999" class="btn btn--whatsapp">
-                <i class="fab fa-whatsapp"></i> Falar com consultor
-              </a>
-            </div>
-            <p class="cta__note">
-              Suporte especializado • Setup rápido • Tutorial incluso
-            </p>
-          </div>
+      <section class="final">
+        <div class="wrap final__in">
+          <h2>Comece hoje, sem compromisso</h2>
+          <p>Crie a conta em um minuto e use o Nexo por 30 dias, grátis.</p>
+          <a class="btn" href="#cadastro">Criar minha conta</a>
         </div>
       </section>
     </main>
 
-    <!-- Footer Padrão - VERSÃO COMPLETA -->
-    <footer class="footer" role="contentinfo">
-      <div class="container">
-        <div class="footer__grid">
-          <div class="footer__brand">
-            <a href="/" class="logo">
-              <div class="logo__icon">
-                <img
-                  src="/assets/favicon/apple-touch-icon.png"
-                  alt="Logo SarmTech"
-                  width="32"
-                  height="32"
-                />
-              </div>
-              <span class="logo__text">
-                <strong>SarmTech</strong>
-                <small>Sistemas Inteligentes</small>
-              </span>
-            </a>
-            <p class="footer__description">
-              Sistema completo para gestão de orçamentos e ordens de serviço.
-            </p>
-            <div class="footer__social">
-              <a
-                href="https://wa.me/5511979755572"
-                aria-label="WhatsApp"
-                target="_blank"
-              >
-                <i class="fab fa-whatsapp"></i>
-              </a>
-              <a
-                href="https://instagram.com/sarmtech"
-                aria-label="Instagram"
-                target="_blank"
-              >
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a href="mailto:contato@sarmtech.com" aria-label="E-mail">
-                <i class="fas fa-envelope"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="footer__nav">
-            <h4>Sistema</h4>
-            <ul>
-              <li><a href="#features">Funcionalidades</a></li>
-              <li><a href="#workflow">Fluxo de Trabalho</a></li>
-              <li><a href="#demo-video">Demonstração</a></li>
-              <li><a href="#testimonials">Quem Recomenda</a></li>
-            </ul>
-          </div>
-
-          <div class="footer__nav">
-            <h4>Legal</h4>
-            <ul>
-              <li>
-                <a href="termos.html" target="_blank" rel="noopener noreferrer"
-                  >Termos de Uso</a
-                >
-              </li>
-              <li>
-                <a
-                  href="privacidade.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >Política de Privacidade</a
-                >
-              </li>
-              <li>
-                <a href="lgpd.html" target="_blank" rel="noopener noreferrer"
-                  >LGPD</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div class="footer__contact">
-            <h4>Fale Conosco</h4>
-            <ul>
-              <li>
-                <i class="fas fa-envelope"></i>
-                <a href="mailto:contato@sarmtech.com"
-                  >contato@sarmtech.com.br</a
-                >
-              </li>
-              <li>
-                <i class="fab fa-whatsapp"></i>
-                <a href="https://wa.me/5511979755572" target="_blank"
-                  >(11) 97975-5572</a
-                >
-              </li>
-              <li>
-                <i class="fas fa-clock"></i>
-                Seg-Sex: 9h às 18h
-              </li>
-            </ul>
-          </div>
+    <footer class="foot">
+      <div class="wrap foot__in">
+        <div>
+          <p class="foot__brand">Nexo</p>
+          <p class="foot__sub">Gestão para quem presta serviço.</p>
         </div>
-
-        <div class="footer__bottom">
-          <div class="footer__copyright">&copy; 2024 SarmTech</div>
-          <div class="footer__tech">
-            <span class="tech-badge">Supabase</span>
-            <span class="tech-badge">PostgreSQL</span>
-            <span class="tech-badge">PWA</span>
-          </div>
-        </div>
+        <ul class="foot__links">
+          <li><a data-app-link="/termos" href="https://app.sarmtech.com.br/termos">Termos de Uso</a></li>
+          <li><a data-app-link="/privacidade" href="https://app.sarmtech.com.br/privacidade">Política de Privacidade</a></li>
+          <li><a data-app-link="/login" href="https://app.sarmtech.com.br/login">Entrar</a></li>
+        </ul>
+        <ul class="foot__links">
+          <li><a href="mailto:lssarmento@inplanejamento.com.br">lssarmento@inplanejamento.com.br</a></li>
+          <li><a href="https://wa.me/5511979755572" target="_blank" rel="noopener">WhatsApp (11) 97975-5572</a></li>
+        </ul>
       </div>
+      <p class="wrap foot__copy">© 2026 Nexo</p>
     </footer>
 
-    <script src="assets/js/main.js" type="module"></script>
+    <script src="/config.js"></script>
+    <script src="/signup.js"></script>
   </body>
 </html>
