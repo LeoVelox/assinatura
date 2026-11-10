@@ -691,6 +691,9 @@ figcaption {
   aspect-ratio: 1280 / 810;
   object-fit: cover;
 }
+.flow__video--mob {
+  display: none;
+}
 .foot__contact {
   display: flex;
   gap: 12px;
@@ -804,5 +807,23 @@ figcaption {
   .shot__main img {
     width: min(300px, 100%);
     margin-inline: auto;
+  }
+}
+
+/* celular: mostra o vídeo vertical (só a tela do sistema) em vez do horizontal */
+@media (max-width: 720px) {
+  .flow__video--desk {
+    display: none;
+  }
+  .flow__video--mob {
+    display: block;
+    width: min(320px, 100%);
+    aspect-ratio: 1 / 2;
+    margin-inline: auto;
+    border-radius: 22px;
+    object-fit: cover;
+  }
+  .flow__shot figcaption {
+    text-align: center;
   }
 }

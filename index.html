@@ -148,9 +148,8 @@
             </ol>
           </div>
           <figure class="flow__shot">
-            <video class="flow__video" width="1280" height="810" autoplay muted loop playsinline preload="metadata" poster="/img/nexo-demo-poster.jpg" aria-label="Demonstração do sistema: tela inicial, clientes, orçamento, ordem de serviço, agenda, laudo e relatórios.">
-              <source src="/img/nexo-demo.mp4" type="video/mp4" />
-            </video>
+            <video class="flow__video flow__video--desk" data-src="/img/nexo-demo.mp4" width="1280" height="810" poster="/img/nexo-demo-poster.jpg" muted loop playsinline preload="none" aria-label="Demonstração do sistema no computador: tela inicial, clientes, orçamento, ordem de serviço, agenda, laudo e relatórios."></video>
+            <video class="flow__video flow__video--mob" data-src="/img/nexo-demo-mobile.mp4" width="720" height="1440" poster="/img/nexo-demo-mobile-poster.jpg" muted loop playsinline preload="none" aria-label="Demonstração do sistema no celular: tela inicial, orçamento, ordem de serviço, agenda e laudo."></video>
             <figcaption>O sistema em uso, com dados de exemplo.</figcaption>
           </figure>
         </div>
@@ -285,6 +284,7 @@
     </footer>
 
     <script src="/config.js"></script>
+    <script src="/demo.js" defer></script>
     <script src="/signup.js"></script>
   </body>
 </html>
