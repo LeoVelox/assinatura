@@ -375,7 +375,9 @@ input {
   margin: 0;
 }
 .shot__main img,
-.flow__shot img {
+.flow__shot img,
+.flow__video {
+  display: block;
   width: 100%;
   border-radius: var(--r-3);
   border: 1px solid var(--line);
@@ -683,6 +685,32 @@ figcaption {
 }
 .foot a {
   color: #d3dbea;
+}
+.flow__video {
+  height: auto;
+  aspect-ratio: 1280 / 810;
+  object-fit: cover;
+}
+.foot__contact {
+  display: flex;
+  gap: 12px;
+  align-content: start;
+  justify-content: flex-start;
+}
+.foot__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid #1c2a40;
+  color: #d3dbea;
+  transition: background 0.15s, color 0.15s;
+}
+.foot__icon:hover,
+.foot__icon:focus-visible {
+  background: #16243a;
+  color: #fff;
 }
 .foot__copy {
   margin-top: 32px;
