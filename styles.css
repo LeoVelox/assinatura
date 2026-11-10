@@ -749,6 +749,20 @@ figcaption {
   }
   .flow__shot {
     position: static;
+    order: 2;
+  }
+  /* no celular e no tablet: título, depois o vídeo, depois as etapas */
+  .flow__text {
+    display: contents;
+  }
+  .flow__text h2 {
+    order: 1;
+  }
+  .flow__text .steps {
+    order: 3;
+  }
+  .flow__in {
+    gap: 28px;
   }
   .plans__grid {
     grid-template-columns: minmax(0, 1fr);
@@ -790,8 +804,5 @@ figcaption {
   .shot__main img {
     width: min(300px, 100%);
     margin-inline: auto;
-  }
-  .flow__shot {
-    display: none;
   }
 }
