@@ -707,6 +707,20 @@ figcaption {
   color: #d3dbea;
   transition: background 0.15s, color 0.15s;
 }
+.foot__icon--mail {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(30, 100, 255, 0.35);
+}
+.foot__icon--mail:hover,
+.foot__icon--mail:focus-visible {
+  background: #3b7bff;
+  color: #fff;
+}
 .foot__icon:hover,
 .foot__icon:focus-visible {
   background: #16243a;
