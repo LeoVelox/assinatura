@@ -1,6 +1,6 @@
 /* Vídeo de demonstração: carrega só o do tamanho da tela (celular ou computador), quando a pessoa chega perto dele. */
 (function () {
-  var fig = document.querySelector(".flow__shot");
+  var fig = document.querySelector(".shot__video");
   if (!fig) return;
   var phone = window.matchMedia("(max-width: 720px)");
   function pick() {
